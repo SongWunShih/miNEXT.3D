@@ -28,7 +28,7 @@
 #' @import iNEXT.beta3D
 #' @useDynLib miNEXT.3D, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
-NULL
+
 
 
 #' @return a list of five objects: \code{$out} for showing mixture diversity estimates for different original assemblage probabilitu along with related statistics;
@@ -44,7 +44,7 @@ NULL
 #' data(dunes)
 #' data = dunes$data
 #' data1 = data[,c(2,1)]
-#' output1 <- miNEXT3D(data1, diversity = 'TD', nboot = 20)
+#' output1 <- miNEXT3D(data1, diversity = 'TD', nboot = 0)
 #' output1
 #'
 #' # diversity = 'PD'
@@ -101,24 +101,6 @@ miNEXT3D = function(data, diversity, knots = 11, size = NULL, q = c(0,1,2),
   return(est)
 }
 
-#' ggplot2 extension for an iNEXT object
-#'
-#' \code{ggmiNEXT3D}: the \code{\link[ggplot2]{ggplot}} extension for \code{\link{iNEXT3D}} Object to plot sample-size- and coverage-based rarefaction/extrapolation curves along with a bridging sample completeness curve
-#' @param x an \code{iNEXT} object computed by \code{\link{iNEXT}}.
-#' @param type three types of plots: sample-size-based rarefaction/extrapolation curve (\code{type = 1});
-#' sample completeness curve (\code{type = 2}); coverage-based rarefaction/extrapolation curve (\code{type = 3}).
-#' @param facet.var create a separate plot for each value of a specified variable:
-#'  no separation \cr (\code{facet.var="None"});
-#'  a separate plot for each diversity order (\code{facet.var="Order.q"});
-#'  a separate plot for each assemblage (\code{facet.var="Assemblage"});
-#'  a separate plot for each combination of order x assemblage (\code{facet.var="Both"}).
-#' @param color.var create curves in different colors for values of a specified variable:
-#'  all curves are in the same color (\code{color.var="None"});
-#'  use different colors for diversity orders (\code{color.var="Order.q"});
-#'  use different colors for sites (\code{color.var="Assemblage"});
-#'  use different colors for combinations of order x assemblage (\code{color.var="Both"}).
-#' @param ... other arguments passed on to methods. Not currently used.
-#' @return a ggplot2 object
 
 
 

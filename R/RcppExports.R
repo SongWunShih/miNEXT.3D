@@ -2,134 +2,134 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 FD_h_fn <- function(m1, m2, n1, n2, k1, k2, vi, ai1, ai2) {
-    .Call('_miNEXT_3D_FD_h_fn', PACKAGE = 'miNEXT.3D', m1, m2, n1, n2, k1, k2, vi, ai1, ai2)
+    .Call(`_miNEXT_3D_FD_h_fn`, m1, m2, n1, n2, k1, k2, vi, ai1, ai2)
 }
 
 FD_h_fn_all <- function(m1, m2, n1, n2, vi, ai1, ai2, q) {
-    .Call('_miNEXT_3D_FD_h_fn_all', PACKAGE = 'miNEXT.3D', m1, m2, n1, n2, vi, ai1, ai2, q)
+    .Call(`_miNEXT_3D_FD_h_fn_all`, m1, m2, n1, n2, vi, ai1, ai2, q)
 }
 
 FD_h_hat_fn <- function(m1, m2, n1, n2, vi, ai1, ai2, q, S) {
-    .Call('_miNEXT_3D_FD_h_hat_fn', PACKAGE = 'miNEXT.3D', m1, m2, n1, n2, vi, ai1, ai2, q, S)
+    .Call(`_miNEXT_3D_FD_h_hat_fn`, m1, m2, n1, n2, vi, ai1, ai2, q, S)
 }
 
 PD_g_fn <- function(m1, m2, n1, n2, k1, k2, Li, ai1, ai2) {
-    .Call('_miNEXT_3D_PD_g_fn', PACKAGE = 'miNEXT.3D', m1, m2, n1, n2, k1, k2, Li, ai1, ai2)
+    .Call(`_miNEXT_3D_PD_g_fn`, m1, m2, n1, n2, k1, k2, Li, ai1, ai2)
 }
 
 PD_g_fn_all <- function(m1, m2, n1, n2, Li, ai1, ai2, q, Tbar) {
-    .Call('_miNEXT_3D_PD_g_fn_all', PACKAGE = 'miNEXT.3D', m1, m2, n1, n2, Li, ai1, ai2, q, Tbar)
+    .Call(`_miNEXT_3D_PD_g_fn_all`, m1, m2, n1, n2, Li, ai1, ai2, q, Tbar)
 }
 
 PD_g_hat_fn <- function(m1, m2, n1, n2, Li, ai1, ai2, q, S, Tbar) {
-    .Call('_miNEXT_3D_PD_g_hat_fn', PACKAGE = 'miNEXT.3D', m1, m2, n1, n2, Li, ai1, ai2, q, S, Tbar)
+    .Call(`_miNEXT_3D_PD_g_hat_fn`, m1, m2, n1, n2, Li, ai1, ai2, q, S, Tbar)
 }
 
 TD_f_fn <- function(m1, m2, n1, n2, k1, k2, ai1, ai2) {
-    .Call('_miNEXT_3D_TD_f_fn', PACKAGE = 'miNEXT.3D', m1, m2, n1, n2, k1, k2, ai1, ai2)
+    .Call(`_miNEXT_3D_TD_f_fn`, m1, m2, n1, n2, k1, k2, ai1, ai2)
 }
 
 TD_f_fn_all <- function(m1, m2, n1, n2, ai1, ai2, q) {
-    .Call('_miNEXT_3D_TD_f_fn_all', PACKAGE = 'miNEXT.3D', m1, m2, n1, n2, ai1, ai2, q)
+    .Call(`_miNEXT_3D_TD_f_fn_all`, m1, m2, n1, n2, ai1, ai2, q)
 }
 
 TD_f_hat_fn <- function(m1, m2, n1, n2, ai1, ai2, q, S) {
-    .Call('_miNEXT_3D_TD_f_hat_fn', PACKAGE = 'miNEXT.3D', m1, m2, n1, n2, ai1, ai2, q, S)
+    .Call(`_miNEXT_3D_TD_f_hat_fn`, m1, m2, n1, n2, ai1, ai2, q, S)
 }
 
 h0_cpp <- function(pi1, pi2, m1, m2s, n2) {
-    .Call('_miNEXT_3D_h0_cpp', PACKAGE = 'miNEXT.3D', pi1, pi2, m1, m2s, n2)
+    .Call(`_miNEXT_3D_h0_cpp`, pi1, pi2, m1, m2s, n2)
 }
 
 h0_cpp_PD <- function(pi1, pi2, Li, m1, m2s, n2) {
-    .Call('_miNEXT_3D_h0_cpp_PD', PACKAGE = 'miNEXT.3D', pi1, pi2, Li, m1, m2s, n2)
+    .Call(`_miNEXT_3D_h0_cpp_PD`, pi1, pi2, Li, m1, m2s, n2)
 }
 
 h0_cpp_FD <- function(pi1, pi2, vi, m1, m2s, n2) {
-    .Call('_miNEXT_3D_h0_cpp_FD', PACKAGE = 'miNEXT.3D', pi1, pi2, vi, m1, m2s, n2)
+    .Call(`_miNEXT_3D_h0_cpp_FD`, pi1, pi2, vi, m1, m2s, n2)
 }
 
 h0_hat_cpp <- function(pi1, pi2, m1, m2s, n1, n2) {
-    .Call('_miNEXT_3D_h0_hat_cpp', PACKAGE = 'miNEXT.3D', pi1, pi2, m1, m2s, n1, n2)
+    .Call(`_miNEXT_3D_h0_hat_cpp`, pi1, pi2, m1, m2s, n1, n2)
 }
 
 h0_hat_cpp_PD <- function(pi1, pi2, Li_v, m1, m2s, n1, n2) {
-    .Call('_miNEXT_3D_h0_hat_cpp_PD', PACKAGE = 'miNEXT.3D', pi1, pi2, Li_v, m1, m2s, n1, n2)
+    .Call(`_miNEXT_3D_h0_hat_cpp_PD`, pi1, pi2, Li_v, m1, m2s, n1, n2)
 }
 
 h0_hat_cpp_FD <- function(pi1, pi2, vi_v, m1, m2s, n1, n2) {
-    .Call('_miNEXT_3D_h0_hat_cpp_FD', PACKAGE = 'miNEXT.3D', pi1, pi2, vi_v, m1, m2s, n1, n2)
+    .Call(`_miNEXT_3D_h0_hat_cpp_FD`, pi1, pi2, vi_v, m1, m2s, n1, n2)
 }
 
 TD_theo <- function(pi1, pi2, m1, m2, k1, k2) {
-    .Call('_miNEXT_3D_TD_theo', PACKAGE = 'miNEXT.3D', pi1, pi2, m1, m2, k1, k2)
+    .Call(`_miNEXT_3D_TD_theo`, pi1, pi2, m1, m2, k1, k2)
 }
 
 PD_theo <- function(pi1, pi2, Li, m1, m2, k1, k2) {
-    .Call('_miNEXT_3D_PD_theo', PACKAGE = 'miNEXT.3D', pi1, pi2, Li, m1, m2, k1, k2)
+    .Call(`_miNEXT_3D_PD_theo`, pi1, pi2, Li, m1, m2, k1, k2)
 }
 
 FD_theo <- function(pi1, pi2, vi, m1, m2, k1, k2) {
-    .Call('_miNEXT_3D_FD_theo', PACKAGE = 'miNEXT.3D', pi1, pi2, vi, m1, m2, k1, k2)
+    .Call(`_miNEXT_3D_FD_theo`, pi1, pi2, vi, m1, m2, k1, k2)
 }
 
 h1 <- function(pi1, pi2, m1, m2, n1, n2) {
-    .Call('_miNEXT_3D_h1', PACKAGE = 'miNEXT.3D', pi1, pi2, m1, m2, n1, n2)
+    .Call(`_miNEXT_3D_h1`, pi1, pi2, m1, m2, n1, n2)
 }
 
 h1_assem2 <- function(pi2, m2, n2) {
-    .Call('_miNEXT_3D_h1_assem2', PACKAGE = 'miNEXT.3D', pi2, m2, n2)
+    .Call(`_miNEXT_3D_h1_assem2`, pi2, m2, n2)
 }
 
 h1_hat <- function(pi1, pi2, xi1, xi2, m1, m2, n1, n2) {
-    .Call('_miNEXT_3D_h1_hat', PACKAGE = 'miNEXT.3D', pi1, pi2, xi1, xi2, m1, m2, n1, n2)
+    .Call(`_miNEXT_3D_h1_hat`, pi1, pi2, xi1, xi2, m1, m2, n1, n2)
 }
 
 h1_PD <- function(pi1, pi2, Li, Tbar, m1, m2, n1, n2) {
-    .Call('_miNEXT_3D_h1_PD', PACKAGE = 'miNEXT.3D', pi1, pi2, Li, Tbar, m1, m2, n1, n2)
+    .Call(`_miNEXT_3D_h1_PD`, pi1, pi2, Li, Tbar, m1, m2, n1, n2)
 }
 
 h1_assem2_PD <- function(pi2, Li, Tbar, m2, n2) {
-    .Call('_miNEXT_3D_h1_assem2_PD', PACKAGE = 'miNEXT.3D', pi2, Li, Tbar, m2, n2)
+    .Call(`_miNEXT_3D_h1_assem2_PD`, pi2, Li, Tbar, m2, n2)
 }
 
 h1_hat_PD <- function(pi1, pi2, Li_v, Tbar, xi1, xi2, m1, m2, n1, n2) {
-    .Call('_miNEXT_3D_h1_hat_PD', PACKAGE = 'miNEXT.3D', pi1, pi2, Li_v, Tbar, xi1, xi2, m1, m2, n1, n2)
+    .Call(`_miNEXT_3D_h1_hat_PD`, pi1, pi2, Li_v, Tbar, xi1, xi2, m1, m2, n1, n2)
 }
 
 h1_FD <- function(pi1, pi2, vi, m1, m2, n1, n2) {
-    .Call('_miNEXT_3D_h1_FD', PACKAGE = 'miNEXT.3D', pi1, pi2, vi, m1, m2, n1, n2)
+    .Call(`_miNEXT_3D_h1_FD`, pi1, pi2, vi, m1, m2, n1, n2)
 }
 
 h1_assem2_FD <- function(pi2, vi, m2, n2) {
-    .Call('_miNEXT_3D_h1_assem2_FD', PACKAGE = 'miNEXT.3D', pi2, vi, m2, n2)
+    .Call(`_miNEXT_3D_h1_assem2_FD`, pi2, vi, m2, n2)
 }
 
 h1_hat_FD <- function(pi1, pi2, vi_v, xi1, xi2, m1, m2, n1, n2) {
-    .Call('_miNEXT_3D_h1_hat_FD', PACKAGE = 'miNEXT.3D', pi1, pi2, vi_v, xi1, xi2, m1, m2, n1, n2)
+    .Call(`_miNEXT_3D_h1_hat_FD`, pi1, pi2, vi_v, xi1, xi2, m1, m2, n1, n2)
 }
 
 un_abun <- function(xi, n, m) {
-    .Call('_miNEXT_3D_un_abun', PACKAGE = 'miNEXT.3D', xi, n, m)
+    .Call(`_miNEXT_3D_un_abun`, xi, n, m)
 }
 
 sh_abun <- function(xi1, xi2, n1, m1, n2, m2) {
-    .Call('_miNEXT_3D_sh_abun', PACKAGE = 'miNEXT.3D', xi1, xi2, n1, m1, n2, m2)
+    .Call(`_miNEXT_3D_sh_abun`, xi1, xi2, n1, m1, n2, m2)
 }
 
 un_abun_PD <- function(Li, xi, n, m) {
-    .Call('_miNEXT_3D_un_abun_PD', PACKAGE = 'miNEXT.3D', Li, xi, n, m)
+    .Call(`_miNEXT_3D_un_abun_PD`, Li, xi, n, m)
 }
 
 sh_abun_PD <- function(Li, xi1, xi2, n1, m1, n2, m2) {
-    .Call('_miNEXT_3D_sh_abun_PD', PACKAGE = 'miNEXT.3D', Li, xi1, xi2, n1, m1, n2, m2)
+    .Call(`_miNEXT_3D_sh_abun_PD`, Li, xi1, xi2, n1, m1, n2, m2)
 }
 
 un_abun_FD <- function(vi, xi, n, m) {
-    .Call('_miNEXT_3D_un_abun_FD', PACKAGE = 'miNEXT.3D', vi, xi, n, m)
+    .Call(`_miNEXT_3D_un_abun_FD`, vi, xi, n, m)
 }
 
 sh_abun_FD <- function(vi, xi1, xi2, n1, m1, n2, m2) {
-    .Call('_miNEXT_3D_sh_abun_FD', PACKAGE = 'miNEXT.3D', vi, xi1, xi2, n1, m1, n2, m2)
+    .Call(`_miNEXT_3D_sh_abun_FD`, vi, xi1, xi2, n1, m1, n2, m2)
 }
 
