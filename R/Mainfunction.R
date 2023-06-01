@@ -73,7 +73,6 @@
 #'
 #' @export
 
-
 miNEXT3D = function(data, diversity, knots = 11, size = NULL, q = c(0,1,2),
                      PDtree, PDreftime = NULL, FDdistM, FDtau = NULL, FDtype = 'AUC', nboot = 0){
 
@@ -81,16 +80,45 @@ miNEXT3D = function(data, diversity, knots = 11, size = NULL, q = c(0,1,2),
 
   if(diversity == 'TD'){
     est = RTD.est(data, knots = knots, size = size, q = q, nboot = nboot)
+
+    m_v = est$m.v
+    m_v[m_v == 0] = 1 #避免iNEXT3D跑 m = 0的情況
+
+    est.ori = iNEXT3D(apply(data, 1, as.vector)[1,], diversity = 'TD',
+                      size = m_v[,1],nboot = nboot)
+    est.trans = iNEXT3D(apply(data, 1, as.vector)[2,], diversity = 'TD',
+                      size = m_v[,2],nboot = nboot)
+
   }else if(diversity == 'PD'){
     est = RPD.est(data, PDtree = PDtree, PDreftime = PDreftime,
                   knots = knots, size = size, q = q, nboot = nboot)
+    m_v = est$m.v
+    m_v[m_v == 0] = 1 #避免iNEXT3D跑 m = 0的情況
+    est.ori = iNEXT3D(apply(data, 1, as.vector)[1,], diversity = 'PD',PDtree = PDtree,
+                      size = est$m.v[,1],nboot = nboot)
+    est.trans = iNEXT3D(apply(data, 1, as.vector)[2,], diversity = 'PD',PDtree = PDtree,
+                        size = est$m.v[,2],nboot = nboot)
   }else if(diversity == 'FD'){
     if(FDtype == 'AUC'){
       est = RFD.est(data, FDdistM = FDdistM, FDtau = FDtau,
                     knots = knots, size = size, q = q, nboot = nboot)
+      m_v = est$m.v
+      m_v[m_v == 0] = 1 #避免iNEXT3D跑 m = 0的情況
+      est.ori = iNEXT3D(apply(data, 1, as.vector)[1,], diversity = 'FD',FDdistM = FDdistM,
+                        size = est$m.v[,1],nboot = nboot)
+      est.trans = iNEXT3D(apply(data, 1, as.vector)[2,], diversity = 'FD',FDdistM = FDdistM,
+                          size = est$m.v[,2],nboot = nboot)
     }else if(FDtype == 'tau_values'){
       est = RFD.singletau.est(data, FDdistM = FDdistM, tau = FDtau,
                               knots = knots, size = size, q = q, nboot = nboot)
+      m_v = est$m.v
+      m_v[m_v == 0] = 1 #避免iNEXT3D跑 m = 0的情況
+      est.ori = iNEXT3D(apply(data, 1, as.vector)[1,], diversity = 'FD', FDdistM = FDdistM,
+                        FDtype = FDtype, FDtau = FDtau,
+                        size = est$m.v[,1],nboot = nboot)
+      est.trans = iNEXT3D(apply(data, 1, as.vector)[2,], diversity = 'FD', FDdistM = FDdistM,
+                          FDtype = FDtype, FDtau = FDtau,
+                          size = est$m.v[,2],nboot = nboot)
     }else{
       print("'FDtype' must be 'AUC' or 'tau_values")
     }
@@ -98,12 +126,169 @@ miNEXT3D = function(data, diversity, knots = 11, size = NULL, q = c(0,1,2),
     print("The diversity must be 'TD', 'PD' or 'FD'.")
   }
 
-  return(est)
+  clean.real.fn = function(est,est.ori,est.trans,data,diversity,FDtype = 'AUC'){
+    p.v = est$ori.prop
+    est.final = est$out[order(est$out$Order.q),]
+    rownames(est.final) = NULL
+    est.final$m1 = rep(est$m.v[,1],length(unique(est.final$Order.q)))
+    est.final$m2 = rep(est$m.v[,2],length(unique(est.final$Order.q)))
+    checkpoint = round(((sum(data[,1])-sum(data[,2]))/sum(data[,1]))*100,3)
+    est.final$linetype = est.final$points = NA
+    est.final$linetype[which(est.final$prop.v >= checkpoint)] = 'Rarefaction'
+    est.final$linetype[which(est.final$prop.v < checkpoint)] = 'Extrapolation'
+    est.final$points[which(est.final$prop.v > checkpoint)] = 'Rarefaction'
+    est.final$points[which(est.final$prop.v < checkpoint)] = 'Extrapolation'
+    est.final$points[which(est.final$prop.v == checkpoint)] = 'Observed'
+    est.final$Method = "Mixture"
+
+    # if(sum(data[,1]) > sum(data[,2])){
+    #   est.final = data.frame(est.final,
+    #                          linetype = linetype,
+    #                          points = points)
+    #
+    # }else{
+    #   est.final = data.frame(est.final,linetype = "rarefaction")
+    # }
+    if(diversity == 'TD'){
+      est.final = select(est.final,Order.q,m1,m2,prop.v,qmiNEXT_TD,LCL,UCL,points,linetype,Method)
+      tmp = est.ori$iNextEst$size_based
+      type = tmp$Method
+      type[type == 'Observed'] = "Rarefaction"
+      est.ori.df = data.frame(Order.q = tmp$Order.q,
+                              m1 = tmp$m,
+                              prop.v = round(tmp$m/sum(data[,1])*100,3),
+                              qmiNEXT_TD = tmp$qD,
+                              LCL = tmp$qD.LCL,
+                              UCL = tmp$qD.UCL,
+                              points = tmp$Method,
+                              linetype = type,
+                              Method = 'Original')
+
+      tmp = est.trans$iNextEst$size_based
+      type = tmp$Method
+      type[type == 'Observed'] = "Rarefaction"
+      est.trans.df = data.frame(Order.q = tmp$Order.q,
+                                m2 = tmp$m,
+                                prop.v = round(tmp$m/sum(data[,1])*100,3),
+                                qmiNEXT_TD = tmp$qD,
+                                LCL = tmp$qD.LCL,
+                                UCL = tmp$qD.UCL,
+                                points = tmp$Method,
+                                linetype = type,
+                                Method = 'Transform')
+    }else if(diversity == 'PD'){
+      est.final = select(est.final,Order.q,m1,m2,prop.v,qmiNEXT_PD,LCL,UCL,points,linetype,Method)
+      tmp = est.ori$PDiNextEst$size_based
+      type = tmp$Method
+      type[type == 'Observed'] = "Rarefaction"
+      est.ori.df = data.frame(Order.q = tmp$Order.q,
+                              m1 = tmp$m,
+                              prop.v = round(tmp$m/sum(data[,1])*100,3),
+                              qmiNEXT_PD = tmp$qPD,
+                              LCL = tmp$qPD.LCL,
+                              UCL = tmp$qPD.UCL,
+                              points = tmp$Method,
+                              linetype = type,
+                              Method = 'Original')
+
+      tmp = est.trans$PDiNextEst$size_based
+      type = tmp$Method
+      type[type == 'Observed'] = "Rarefaction"
+      est.trans.df = data.frame(Order.q = tmp$Order.q,
+                                m2 = tmp$m,
+                                prop.v = round(tmp$m/sum(data[,1])*100,3),
+                                qmiNEXT_PD = tmp$qPD,
+                                LCL = tmp$qPD.LCL,
+                                UCL = tmp$qPD.UCL,
+                                points = tmp$Method,
+                                linetype = type,
+                                Method = 'Transform')
+    }else if(diversity == 'FD' & FDtype == 'AUC'){
+      est.final = select(est.final,Order.q,m1,m2,prop.v,qmiNEXT_FD,LCL,UCL,points,linetype,Method)
+      tmp = est.ori$AUCiNextEst$size_based
+      type = tmp$Method
+      type[type == 'Observed'] = "Rarefaction"
+      est.ori.df = data.frame(Order.q = tmp$Order.q,
+                              m1 = tmp$m,
+                              prop.v = round(tmp$m/sum(data[,1])*100,3),
+                              qmiNEXT_FD = tmp$qAUC,
+                              LCL = tmp$qAUC.LCL,
+                              UCL = tmp$qAUC.UCL,
+                              points = tmp$Method,
+                              linetype = type,
+                              Method = 'Original')
+
+      tmp = est.trans$AUCiNextEst$size_based
+      type = tmp$Method
+      type[type == 'Observed'] = "Rarefaction"
+      est.trans.df = data.frame(Order.q = tmp$Order.q,
+                                m2 = tmp$m,
+                                prop.v = round(tmp$m/sum(data[,1])*100,3),
+                                qmiNEXT_FD = tmp$qAUC,
+                                LCL = tmp$qAUC.LCL,
+                                UCL = tmp$qAUC.UCL,
+                                points = tmp$Method,
+                                linetype = type,
+                                Method = 'Transform')
+    }else if(diversity == 'FD' & FDtype == 'tau_values'){
+      est.final = select(est.final,Order.q,m1,m2,prop.v,qmiNEXT_FD,LCL,UCL,points,linetype,Method)
+      tmp = est.ori$FDiNextEst$size_based
+      type = tmp$Method
+      type[type == 'Observed'] = "Rarefaction"
+      est.ori.df = data.frame(Order.q = tmp$Order.q,
+                              m1 = tmp$m,
+                              prop.v = round(tmp$m/sum(data[,1])*100,3),
+                              qmiNEXT_FD = tmp$qFD,
+                              LCL = tmp$qFD.LCL,
+                              UCL = tmp$qFD.UCL,
+                              points = tmp$Method,
+                              linetype = type,
+                              Method = 'Original')
+
+      tmp = est.trans$FDiNextEst$size_based
+      type = tmp$Method
+      type[type == 'Observed'] = "Rarefaction"
+      est.trans.df = data.frame(Order.q = tmp$Order.q,
+                                m2 = tmp$m,
+                                prop.v = round(tmp$m/sum(data[,1])*100,3),
+                                qmiNEXT_FD = tmp$qFD,
+                                LCL = tmp$qFD.LCL,
+                                UCL = tmp$qFD.UCL,
+                                points = tmp$Method,
+                                linetype = type,
+                                Method = 'Transform')
+    }
+
+
+    return(list(Mixture = est.final, Orignal = est.ori.df, Transform = est.trans.df))
+
+  }
+  final = clean.real.fn(est,est.ori,est.trans,data,diversity,FDtype = FDtype)
+  return(final)
 }
 
 
 
-
+#' ggplot2 extension for an miNEXT3D object
+#'
+#' \code{ggmiNEXT3D}: the \code{\link[ggplot2]{ggplot}} extension for \code{\link{miNEXT3D}} Object to plot probability-based rarefaction/extrapolation curves
+#' @param x an \code{miNEXT3D} object computed by \code{\link{miNEXT3D}}.
+#' @param type three types of plots: sample-size-based rarefaction/extrapolation curve (\code{type = 1});
+#' sample completeness curve (\code{type = 2}); coverage-based rarefaction/extrapolation curve (\code{type = 3}).
+#' @param facet.var create a separate plot for each value of a specified variable:
+#'  no separation \cr (\code{facet.var="None"});
+#'  a separate plot for each diversity order (\code{facet.var="Order.q"});
+#'  a separate plot for each assemblage (\code{facet.var="Assemblage"});
+#'  a separate plot for each combination of order x assemblage (\code{facet.var="Both"}).
+#' @param color.var create curves in different colors for values of a specified variable:
+#'  all curves are in the same color (\code{color.var="None"});
+#'  use different colors for diversity orders (\code{color.var="Order.q"});
+#'  use different colors for sites (\code{color.var="Assemblage"});
+#'  use different colors for combinations of order x assemblage (\code{color.var="Both"}).
+#' @param ... other arguments passed on to methods. Not currently used.
+#' @return a ggplot2 object
+#'
+#' @examples
 
 
 
