@@ -321,9 +321,6 @@ miNEXT3D = function(data, diversity, knots = 11, size = NULL, q = c(0,1,2),
 #' plot4
 #'
 #' @export
-#'
-#'
-#'
 ggmiNEXT3D = function(out){
   tmp1 = subset(out$Mixture,select = -c(m1,m2))
   tmp2 = subset(out$Orignal,select = -c(m1))
