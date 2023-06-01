@@ -44,13 +44,10 @@ If NULL, then diversity estimates will be computed for those sample sizes determ
 \item{nboot}{a positive integer specifying the number of bootstrap replications when assessing sampling uncertainty and constructing confidence intervals. Enter 0 to skip the bootstrap procedures. Default is 0.}
 }
 \value{
-a list of five objects: \code{$out} for showing mixture diversity estimates for different original assemblage probabilitu along with related statistics;
+a list of five objects: \code{$Mixture} for showing mixture diversity estimates for different size of Original and Transform assemblagt along with related statistics;
+\code{$Original} for showing Original diversity estimates for the size of Original assemblage ;
+\code{$Transform} for showing Transform diversity estimates for the size of Transform assemblage ;
 \code{$q0_ana} for showing composition information in a mixed sample;
-\code{$ori.prop} for showing different original assemblage probabilitu;
-\code{$m.v} for showing different number of individuals of original assemblage 'm1.v' and transform assemblage 'm2.v';
-and \code{$line_type} for showing the type of mixture sample. \cr
-'Rarefaction' means mixture of two rarefaction curves. \cr
-'Extrapolation' means mixture of one rarefaction curve and one extrapolation curve.
 }
 \description{
 \code{miNEXT3D}: Mixture interpolation and extrapolation of Hill number with order q
@@ -58,32 +55,32 @@ and \code{$line_type} for showing the type of mixture sample. \cr
 \examples{
 # diversity = 'TD'
 data(dunes)
-data = dunes$data
-data1 = data[,c(2,1)]
-output1 <- miNEXT3D(data1, diversity = 'TD', nboot = 20)
+data <- dunes$data
+data1 <- data[,c(2,1)]
+output1 <- miNEXT3D(data1, diversity = 'TD', nboot = 10)
 output1
 
 # diversity = 'PD'
 data(dunes)
 data <- dunes$data
-data1 = data[,c(2,1)]
+data1 <- data[,c(2,1)]
 tree <- dunes$tree
-output2 <- miNEXT3D(data1, diversity = 'PD', PDtree = tree, nboot = 20)
+output2 <- miNEXT3D(data1, diversity = 'PD', PDtree = tree, nboot = 10)
 output2
 
 # diversity = 'FD' & FDtype = 'tau_values'
 data(dunes)
 data <- dunes$data
-data1 = data[,c(2,1)]
-distM = as.matrix(dunes$dist)
+data1 <- data[,c(2,1)]
+distM <- as.matrix(dunes$dist)
 output3 <- miNEXT3D(data1, diversity = 'FD', FDdistM = distM, FDtau = 0.3, FDtype = 'tau_values', nboot = 10)
 output3
 
 # diversity = 'FD' & FDtype = 'AUC'
 data(dunes)
 data <- dunes$data
-data1 = data[,c(2,1)]
-distM = as.matrix(dunes$dist)
+data1 <- data[,c(2,1)]
+distM <- as.matrix(dunes$dist)
 output4 <- miNEXT3D(data1, diversity = 'FD', FDdistM = distM, FDtype = 'AUC', nboot = 0)
 output4
 
