@@ -82,9 +82,9 @@ miNEXT3D = function(data, diversity, knots = 11, size = NULL, q = c(0,1,2),
     m_v = est$m.v
     m_v[m_v == 0] = 1 #避免iNEXT3D跑 m = 0的情況
 
-    est.ori = iNEXT3D(apply(data, 1, as.vector)[1,], diversity = 'TD',
+    est.ori = iNEXT3D(apply(data, 1, as.vector)[1,], diversity = 'TD', q = q,
                       size = m_v[,1],nboot = nboot)
-    est.trans = iNEXT3D(apply(data, 1, as.vector)[2,], diversity = 'TD',
+    est.trans = iNEXT3D(apply(data, 1, as.vector)[2,], diversity = 'TD', q = q,
                       size = m_v[,2],nboot = nboot)
 
   }else if(diversity == 'PD'){
@@ -92,9 +92,9 @@ miNEXT3D = function(data, diversity, knots = 11, size = NULL, q = c(0,1,2),
                   knots = knots, size = size, q = q, nboot = nboot)
     m_v = est$m.v
     m_v[m_v == 0] = 1 #避免iNEXT3D跑 m = 0的情況
-    est.ori = iNEXT3D(apply(data, 1, as.vector)[1,], diversity = 'PD',PDtree = PDtree,
+    est.ori = iNEXT3D(apply(data, 1, as.vector)[1,], diversity = 'PD',PDtree = PDtree, q = q,
                       size = m_v[,1],nboot = nboot)
-    est.trans = iNEXT3D(apply(data, 1, as.vector)[2,], diversity = 'PD',PDtree = PDtree,
+    est.trans = iNEXT3D(apply(data, 1, as.vector)[2,], diversity = 'PD',PDtree = PDtree, q = q,
                         size = m_v[,2],nboot = nboot)
   }else if(diversity == 'FD'){
     if(FDtype == 'AUC'){
@@ -102,19 +102,19 @@ miNEXT3D = function(data, diversity, knots = 11, size = NULL, q = c(0,1,2),
                     knots = knots, size = size, q = q, nboot = nboot)
       m_v = est$m.v
       m_v[m_v == 0] = 1 #避免iNEXT3D跑 m = 0的情況
-      est.ori = iNEXT3D(apply(data, 1, as.vector)[1,], diversity = 'FD',FDdistM = FDdistM,
+      est.ori = iNEXT3D(apply(data, 1, as.vector)[1,], diversity = 'FD',FDdistM = FDdistM, q = q,
                         size = m_v[,1],nboot = nboot)
-      est.trans = iNEXT3D(apply(data, 1, as.vector)[2,], diversity = 'FD',FDdistM = FDdistM,
+      est.trans = iNEXT3D(apply(data, 1, as.vector)[2,], diversity = 'FD',FDdistM = FDdistM, q = q,
                           size = m_v[,2],nboot = nboot)
     }else if(FDtype == 'tau_values'){
       est = RFD.singletau.est(data, FDdistM = FDdistM, tau = FDtau,
                               knots = knots, size = size, q = q, nboot = nboot)
       m_v = est$m.v
       m_v[m_v == 0] = 1 #避免iNEXT3D跑 m = 0的情況
-      est.ori = iNEXT3D(apply(data, 1, as.vector)[1,], diversity = 'FD', FDdistM = FDdistM,
+      est.ori = iNEXT3D(apply(data, 1, as.vector)[1,], diversity = 'FD', FDdistM = FDdistM, q = q,
                         FDtype = FDtype, FDtau = FDtau,
                         size = m_v[,1],nboot = nboot)
-      est.trans = iNEXT3D(apply(data, 1, as.vector)[2,], diversity = 'FD', FDdistM = FDdistM,
+      est.trans = iNEXT3D(apply(data, 1, as.vector)[2,], diversity = 'FD', FDdistM = FDdistM, q = q,
                           FDtype = FDtype, FDtau = FDtau,
                           size = m_v[,2],nboot = nboot)
     }else{
