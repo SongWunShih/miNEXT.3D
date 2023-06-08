@@ -19,7 +19,7 @@ a ggplot2 object
 # diversity = 'TD'
 data(dunes)
 data <- dunes$data
-data1 <- data[,c(2,1)]
+data1 <- data[,c(3,1)]
 output1 <- miNEXT3D(data1, diversity = 'TD', nboot = 10)
 plot1 <- ggmiNEXT3D(output1)
 plot1
@@ -27,7 +27,7 @@ plot1
 # diversity = 'PD'
 data(dunes)
 data <- dunes$data
-data1 <- data[,c(2,1)]
+data1 <- data[,c(3,1)]
 tree <- dunes$tree
 output2 <- miNEXT3D(data1, diversity = 'PD', PDtree = tree, nboot = 10)
 plot2 <- ggmiNEXT3D(output2)
@@ -36,7 +36,7 @@ plot2
 # diversity = 'FD' & FDtype = 'tau_values'
 data(dunes)
 data <- dunes$data
-data1 <- data[,c(2,1)]
+data1 <- data[,c(3,1)]
 distM <- as.matrix(dunes$dist)
 output3 <- miNEXT3D(data1, diversity = 'FD', FDdistM = distM, FDtau = 0.3, FDtype = 'tau_values', nboot = 10)
 plot3 <- ggmiNEXT3D(output3)
@@ -45,7 +45,7 @@ plot3
 # diversity = 'FD' & FDtype = 'AUC'
 data(dunes)
 data <- dunes$data
-data1 <- data[,c(2,1)]
+data1 <- data[,c(3,1)]
 distM <- as.matrix(dunes$dist)
 output4 <- miNEXT3D(data1, diversity = 'FD', FDdistM = distM, FDtype = 'AUC', nboot = 0)
 plot4 <- ggmiNEXT3D(output4)

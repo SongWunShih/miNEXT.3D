@@ -22,6 +22,63 @@ DetAbu <- function(x, zero=FALSE){
   o
 }
 
+Bootstrap_distance_matrix <- function (data, distance_matrix, f0.hat, datatype){
+  if (datatype == "incidence_freq") {
+    n = data[1]
+    X = data[-1]
+    u = sum(data)
+  }
+  else if (datatype == "abundance") {
+    n = sum(data)
+    X = data
+  }
+  distance = as.matrix(distance_matrix)
+  dij = distance
+  F.1 <- sum(dij[, X == 1])
+  F.2 <- sum(dij[, X == 2])
+  F11 <- sum(dij[X == 1, X == 1])
+  F22 <- sum(dij[X == 2, X == 2])
+  if (datatype == "abundance") {
+    F.0hat <- ifelse(F.2 > 0, ((n - 1)/n) * (F.1^2/(2 *
+                                                      F.2)), ((n - 1)/n) * (F.1 * (F.1 - 0.01)/(2)))
+    F00hat <- ifelse(F22 > 0, ((n - 2) * (n - 3) * (F11^2)/(4 *
+                                                              n * (n - 1) * F22)), ((n - 2) * (n - 3) * (F11 *
+                                                                                                           (F11 - 0.01))/(4 * n * (n - 1))))
+  }
+  else if (datatype == "incidence_freq") {
+    F.0hat <- ifelse(F.2 > 0, ((n - 1)/n) * (F.1^2/(2 *
+                                                      F.2)), ((n - 1)/n) * (F.1 * (F.1 - 0.01)/(2)))
+    F00hat <- ifelse(F22 > 0, ((n - 1)^2 * (F11^2)/(4 *
+                                                      n * n * F22)), ((n - 1) * (n - 1) * (F11 * (F11 -
+                                                                                                    0.01))/(4 * n * n)))
+  }
+  if (f0.hat == 0) {
+    d = dij
+  }
+  else if (f0.hat == 1) {
+    d.0bar <- matrix(rep(F.0hat/length(X)/f0.hat, length(X) *
+                           f0.hat), length(X), f0.hat)
+    d00 = matrix(0, f0.hat, f0.hat)
+    d <- cbind(dij, d.0bar)
+    aa <- cbind(t(d.0bar), d00)
+    d <- rbind(d, aa)
+    diag(d) = 0
+  }
+  else {
+    d.0bar <- matrix(rep(F.0hat/length(X)/f0.hat, length(X) *
+                           f0.hat), length(X), f0.hat)
+    fo.num = (f0.hat * (f0.hat - 1))/2
+    d00 = matrix(0, f0.hat, f0.hat)
+    d00[upper.tri(d00)] = (F00hat/2)/fo.num
+    d00 <- pmax(d00, t(d00))
+    d <- cbind(dij, d.0bar)
+    aa <- cbind(t(d.0bar), d00)
+    d <- rbind(d, aa)
+    diag(d) = 0
+  }
+  return(d)
+}
+
 FDq2<-function(x1,x2,vi.all,m1,m2,n1,n2){
 
   D2 = 0
@@ -302,7 +359,7 @@ mix.aivi.sample.FD = function(data, m1, m2, FDdistM, tau){
 
   return(list(ai1_mat = aivi_1$ai, ai2_mat = aivi_2$ai, vi_all_mat = aivi_sum$vi))
 }
-RFD.est <- function(data, FDdistM, FDtau = NULL, knots = 11, size = NULL, q = c(0,1,2), nboot = 0) {
+RFD.est <- function(data, FDdistM, FDtau = NULL, knots = 11, size = NULL, q = c(0,1,2), conf = 0.95, nboot = 0) {
 
   n1 = sum(data[,1])
   n2 = sum(data[,2])
@@ -425,10 +482,9 @@ RFD.est <- function(data, FDdistM, FDtau = NULL, knots = 11, size = NULL, q = c(
       # =======================================================
 
       se = future.apply::future_lapply(1:nboot, function(boottime){
-        p_bt = iNEXT.beta3D:::bootstrap_population_multiple_assemblage(data,
-                                                                       data_gamma, "abundance")
+        p_bt = bootstrap_population_multiple_assemblage(data, data_gamma, "abundance")
         f0_hat = nrow(p_bt) - nrow(data)
-        distance_matrix_bt = iNEXT.beta3D:::Bootstrap_distance_matrix(rowSums(data),
+        distance_matrix_bt = Bootstrap_distance_matrix(rowSums(data),
                                                                       FDdistM, f0_hat, "abundance")
         data_bt = sapply(1:ncol(data), function(k) rmultinom(n = 1,
                                                              size = sum(data[, k]), prob = p_bt[, k]))
@@ -501,8 +557,9 @@ RFD.est <- function(data, FDdistM, FDtau = NULL, knots = 11, size = NULL, q = c(
       se = abind::abind(se,along = 2)
       se = apply(se, 1, sd)
 
-      auc.table$LCL = auc.table$qmiNEXT_FD - 1.96*se
-      auc.table$UCL = auc.table$qmiNEXT_FD + 1.96*se
+      qtile <- qnorm(1 - (1 - conf)/2)
+      auc.table$LCL = auc.table$qmiNEXT_FD - qtile*se
+      auc.table$UCL = auc.table$qmiNEXT_FD + qtile*se
 
     }else{
       auc.table$LCL = NA
@@ -568,7 +625,7 @@ RFD.est <- function(data, FDdistM, FDtau = NULL, knots = 11, size = NULL, q = c(
 
         h0.FD = h0_hat_cpp_FD(ai1.ext.v,ai2.ext.v,vi.all.ext.v,m1,m2_s,n1,n2)
         ## 思考h1_hat_FD的xi1, xi2要放啥
-        h1.FD = h1_hat_FD(ai1.ext.v, ai2.ext.v, vi.all.ext.v, p_bind[,1], p_bind[,2],
+        h1.FD = h1_hat_FD(ai1.ext.v, ai2.ext.v, vi.all.ext.v, ai1.v, ai2.v,
                           m1, m2_all, n1, n2)
 
         ## ===================================================
@@ -620,11 +677,9 @@ RFD.est <- function(data, FDdistM, FDtau = NULL, knots = 11, size = NULL, q = c(
       # =======================================================
 
       se = future.apply::future_lapply(1:nboot, function(boottime){
-        p_bt = iNEXT.beta3D:::bootstrap_population_multiple_assemblage(data,
-                                                                       data_gamma, "abundance")
+        p_bt = bootstrap_population_multiple_assemblage(data, data_gamma, "abundance")
         f0_hat = nrow(p_bt) - nrow(data)
-        distance_matrix_bt = iNEXT.beta3D:::Bootstrap_distance_matrix(rowSums(data),
-                                                                      FDdistM, f0_hat, "abundance")
+        distance_matrix_bt = Bootstrap_distance_matrix(rowSums(data), FDdistM, f0_hat, "abundance")
 
         data_bt = sapply(1:ncol(data), function(k) rmultinom(n = 1,
                                                              size = sum(data[, k]), prob = p_bt[, k]))
@@ -696,7 +751,7 @@ RFD.est <- function(data, FDdistM, FDtau = NULL, knots = 11, size = NULL, q = c(
 
             h0.FD = h0_hat_cpp_FD(ai1.ext.v,ai2.ext.v,vi.all.ext.v,m1,m2_s,n1,n2)
             ## 思考h1_hat_FD的xi1, xi2要放啥
-            h1.FD = h1_hat_FD(ai1.ext.v, ai2.ext.v, vi.all.ext.v, p_bind_bt[,1], p_bind_bt[,2],
+            h1.FD = h1_hat_FD(ai1.ext.v, ai2.ext.v, vi.all.ext.v, ai1.v, ai2.v,
                               m1, m2_all, n1, n2)
 
             ## ===================================================
@@ -749,8 +804,9 @@ RFD.est <- function(data, FDdistM, FDtau = NULL, knots = 11, size = NULL, q = c(
       se = abind::abind(se,along = 2)
       se = apply(se, 1, sd)
 
-      auc.table$LCL = auc.table$qmiNEXT_FD - 1.96*se
-      auc.table$UCL = auc.table$qmiNEXT_FD + 1.96*se
+      qtile <- qnorm(1 - (1 - conf)/2)
+      auc.table$LCL = auc.table$qmiNEXT_FD - qtile*se
+      auc.table$UCL = auc.table$qmiNEXT_FD + qtile*se
 
     }else{
       auc.table$LCL = NA
@@ -968,7 +1024,22 @@ RFD.singletau.obs <- function(data, FDdistM, tau, knots = 11, size = NULL, q = c
   colnames(output) = c("Order.q","prop.v","qmiNEXT_FD_singletau")
   return(list(out = output,ori.prop = prop.v,m.v = m.v,line_type = line_type))
 }
-RFD.singletau.est <- function(data, FDdistM, tau, knots = 11, size = NULL, q = c(0,1,2), nboot = 0) {
+RFD.singletau.est <- function(data, FDdistM, tau = NULL, knots = 11, size = NULL, q = c(0,1,2), conf = 0.95, nboot = 0) {
+
+  if (length(tau) > 1){
+    stop("Threshold must be one number between 0 and 1. Check the length of tau.",
+         call. = FALSE)
+  }
+  if (is.null(tau)) {
+    tmp = rowSums(data)
+    tmp <- matrix(tmp/sum(tmp), ncol = 1)
+    tau <- sum((tmp %*% t(tmp)) * FDdistM)
+  }else if (tau < 0 | tau > 1){
+    stop("Threshold must be one number between 0 and 1. Use NULL to set it to dmean.",
+         call. = FALSE)
+  }else{
+    tau <- tau
+  }
 
 
   n1 = sum(data[,1])
@@ -1023,6 +1094,7 @@ RFD.singletau.est <- function(data, FDdistM, tau, knots = 11, size = NULL, q = c
     S <- nrow(data)
     qlength <- length(q)
     out = list()
+    un1 = un2 = sh12 = c()
 
     for (zz in 1:length(m1.v)) {
       ai1.v = aivi.sample.data[[zz]]$ai1_mat
@@ -1045,6 +1117,19 @@ RFD.singletau.est <- function(data, FDdistM, tau, knots = 11, size = NULL, q = c
           out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
         }
       }
+
+      ## q0 ana =========================================
+      datanew = cbind(ai1.v,ai2.v)
+      rownames(datanew) = names(vi.all.v) = rownames(data)
+      datash = datanew[(ai1.v>0 & ai2.v>0), , drop=F]
+      dataun1 = datanew[(ai1.v>0 & ai2.v==0), , drop=F]
+      dataun2 = datanew[(ai1.v==0 & ai2.v>0), , drop=F]
+
+      un1[zz] = sum(un_abun_FD(vi = vi.all.v[rownames(dataun1)],xi = dataun1[,1], n = n1, m = m1.v[zz]))
+      un2[zz] = sum(un_abun_FD(vi = vi.all.v[rownames(dataun2)],xi = dataun2[,2], n = n2, m = m2.v[zz]))
+      sh12[zz] = sum(sh_abun_FD(vi = vi.all.v[rownames(datash)],xi1 = datash[,1],xi2 = datash[,2], n1 = n1,
+                                m1 =  m1.v[zz], n2 = n2, m2 = m2.v[zz]))
+
     }
 
     output = matrix(sapply(out, function(x) x[, 1]), ncol = length(m2.v))
@@ -1053,52 +1138,28 @@ RFD.singletau.est <- function(data, FDdistM, tau, knots = 11, size = NULL, q = c
     output = reshape2::melt(output)
     colnames(output) = c("Order.q","prop.v","qmiNEXT_FD_singletau")
 
-    ## q0 ana =========================================
-    un1 = un2 = sh12 = c()
-    for (zz in 1:length(m1.v)){
-      ai1.v = aivi.sample.data[[zz]]$ai1_mat
-      ai2.v = aivi.sample.data[[zz]]$ai2_mat
-      # ai.all.v = aivi.sample.data[[zz]]$ai_all_mat
-      vi.all.v = aivi.sample.data[[zz]]$vi_all_mat
-      datanew = cbind(ai1.v,ai2.v)
-      datash = datanew[(datanew[,1]>0 & datanew[,2]>0), , drop=F]
-      dataun1 = datanew[(datanew[,1]>0 & datanew[,2]==0), , drop=F]
-      dataun2 = datanew[(datanew[,1]==0 & datanew[,2]>0), , drop=F]
 
-      un1[zz] = sum(un_abun_FD(vi = vi.all.v[rownames(dataun1)],xi = dataun1[,1], n = n1))
-      un2[zz] = sapply(m2.v,function(i){
-        sum(un_abun_PD(Li = Li.all.v[rownames(dataun2)],xi = dataun2[,2], n = n2, m = i))
-      })
-      sh12[zz] = sapply(1:length(m1.v),function(i){
-        sum(sh_abun_PD(Li = Li.all.v[rownames(datash)],xi1 = datash[,1],xi2 = datash[,2], n1 = n1, m1 =  m1.v[i],
-                       n2 = n2, m2 = m2.v[i]))
-      })
-      q0_ana = data.frame(prop.v = prop.v ,
-                          q0_un1 = un1, q0_un2 = un2,
-                          q0_sh = sh12)
-      q0_ana = reshape2::melt(q0_ana,id = c('prop.v'))
-      colnames(q0_ana)[2:3] = c('Type','Value')
-    }
-
-
+    q0_ana = data.frame(prop.v = prop.v ,
+                        q0_un1 = un1, q0_un2 = un2,
+                        q0_sh = sh12)
+    q0_ana = reshape2::melt(q0_ana,id = c('prop.v'))
+    colnames(q0_ana)[2:3] = c('Type','Value')
 
     if(nboot>0){
       data_gamma = rowSums(data)
       se = future.apply::future_lapply(1:nboot, function(boottime){
-        p_bt = iNEXT.beta3D:::bootstrap_population_multiple_assemblage(data,
-                                                                       data_gamma, "abundance")
+        p_bt = bootstrap_population_multiple_assemblage(data, data_gamma, "abundance")
         f0_hat = nrow(p_bt) - nrow(data)
-        distance_matrix_bt = iNEXT.beta3D:::Bootstrap_distance_matrix(rowSums(data),
-                                                                      FDdistM, f0_hat, "abundance")
+        distance_matrix_bt = Bootstrap_distance_matrix(rowSums(data), FDdistM, f0_hat, "abundance")
         data_bt = sapply(1:ncol(data), function(k) rmultinom(n = 1,size = sum(data[, k]), prob = p_bt[, k]))
 
         aivi.sample.data = lapply(1:nrow(m.v), function (k) mix.aivi.sample.FD.single(data_bt, m1.v[k], m2.v[k], FDdistM = distance_matrix_bt,
                                                                                       tau = tau))
 
-        # Li.v = apply(Lis, 1, function(x) x[1]*x[2])
         S <- nrow(data_bt)
         qlength <- length(q)
         out = list()
+        un1 = un2 = sh12 = c()
 
         for (zz in 1:length(m1.v)) {
           ai1.v = aivi.sample.data[[zz]]$ai1_mat
@@ -1121,6 +1182,20 @@ RFD.singletau.est <- function(data, FDdistM, tau, knots = 11, size = NULL, q = c
               out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
             }
           }
+
+          ## q0 ana =========================================
+          datanew = cbind(ai1.v,ai2.v)
+          rownames(datanew) = names(vi.all.v) = rownames(data_bt)
+          datash = datanew[(ai1.v>0 & ai2.v>0), , drop=F]
+          dataun1 = datanew[(ai1.v>0 & ai2.v==0), , drop=F]
+          dataun2 = datanew[(ai1.v==0 & ai2.v>0), , drop=F]
+
+          un1[zz] = sum(un_abun_FD(vi = vi.all.v[rownames(dataun1)],xi = dataun1[,1], n = n1, m = m1.v[zz]))
+          un2[zz] = sum(un_abun_FD(vi = vi.all.v[rownames(dataun2)],xi = dataun2[,2], n = n2, m = m2.v[zz]))
+          sh12[zz] = sum(sh_abun_FD(vi = vi.all.v[rownames(datash)],xi1 = datash[,1],xi2 = datash[,2], n1 = n1,
+                                    m1 =  m1.v[zz], n2 = n2, m2 = m2.v[zz]))
+
+
         }
 
         output = matrix(sapply(out, function(x) x[, 1]), ncol = length(m2.v))
@@ -1131,19 +1206,38 @@ RFD.singletau.est <- function(data, FDdistM, tau, knots = 11, size = NULL, q = c
         colnames(output) = c("Order.q","prop.v","qmiNEXT_FD_singletau")
 
         res = output$qmiNEXT_FD_singletau
-        res
-      },future.seed = NULL) %>% cbind()
-      se = abind::abind(se,along = 2)
-      se = apply(se, 1, sd)
 
-      output$LCL = output$qmiNEXT_FD_singletau - 1.96*se
-      output$UCL = output$qmiNEXT_FD_singletau + 1.96*se
+        ## q0_ana ==========================================
+        q0_ana = data.frame(prop.v = prop.v ,
+                            q0_un1 = un1, q0_un2 = un2,
+                            q0_sh = sh12)
+        q0_ana = reshape2::melt(q0_ana,id = c('prop.v'))
+        colnames(q0_ana)[2:3] = c('Type','Value')
+        res_q0ana = q0_ana$Value
+        return(list(allana = res,q0ana = res_q0ana))
+
+      },future.seed = NULL)
+      se_all = do.call(cbind,lapply(se, function(k) k$allana))
+      se_q0ana = do.call(cbind,lapply(se, function(k) k$q0ana))
+      se_all = apply(se_all, 1, sd)
+      se_q0ana = apply(se_q0ana, 1, sd)
+
+      qtile <- qnorm(1 - (1 - conf)/2)
+      output$LCL = output$qmiNEXT_FD_singletau - qtile*se_all
+      output$UCL = output$qmiNEXT_FD_singletau + qtile*se_all
+
+      q0_ana$LCL = q0_ana$Value - qtile*se_q0ana
+      q0_ana$UCL = q0_ana$Value + qtile*se_q0ana
+
+      q0_ana$LCL[q0_ana$LCL<0] = 0
 
     }else{
       output$LCL = NA
       output$UCL = NA
+      q0_ana$LCL = NA
+      q0_ana$UCL = NA
     }
-    return(list(out = output,ori.prop = prop.v,m.v = m.v,line_type = line_type))
+    return(list(out = output,q0_ana = q0_ana,ori.prop = prop.v,m.v = m.v,line_type = line_type))
 
   }else{
 
@@ -1152,11 +1246,10 @@ RFD.singletau.est <- function(data, FDdistM, tau, knots = 11, size = NULL, q = c
                                                                           tau = tau))
     }
 
-
-    # Li.v = apply(Lis, 1, function(x) x[1]*x[2])
     S <- nrow(data)
     qlength <- length(q)
     out = list()
+    un1 = un2 = sh12 = c()
 
     for (zz in inc.idx) {
       ai1.v = aivi.sample.data[[zz]]$ai1_mat
@@ -1178,6 +1271,20 @@ RFD.singletau.est <- function(data, FDdistM, tau, knots = 11, size = NULL, q = c
           out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
         }
       }
+
+      ## q0 ana =========================================
+      datanew = cbind(ai1.v,ai2.v)
+      rownames(datanew) = names(vi.all.v) = rownames(data)
+      datash = datanew[(ai1.v>0 & ai2.v>0), , drop=F]
+      dataun1 = datanew[(ai1.v>0 & ai2.v==0), , drop=F]
+      dataun2 = datanew[(ai1.v==0 & ai2.v>0), , drop=F]
+
+      un1[zz] = sum(un_abun_FD(vi = vi.all.v[rownames(dataun1)],xi = dataun1[,1], n = n1, m = m1.v[zz]))
+      un2[zz] = sum(un_abun_FD(vi = vi.all.v[rownames(dataun2)],xi = dataun2[,2], n = n2, m = m2.v[zz]))
+      sh12[zz] = sum(sh_abun_FD(vi = vi.all.v[rownames(datash)],xi1 = datash[,1],xi2 = datash[,2], n1 = n1,
+                                m1 =  m1.v[zz], n2 = n2, m2 = m2.v[zz]))
+
+
     }
     # 新增外插 ========================================
     for (zz in ext.idx) {
@@ -1200,7 +1307,7 @@ RFD.singletau.est <- function(data, FDdistM, tau, knots = 11, size = NULL, q = c
 
       h0.FD = h0_hat_cpp_FD(ai1.ext.v,ai2.ext.v,vi.all.ext.v,m1,m2_s,n1,n2)
       ## 思考h1_hat_FD的xi1, xi2要放啥
-      h1.FD = h1_hat_FD(ai1.ext.v, ai2.ext.v, vi.all.ext.v, p_bind[,1], p_bind[,2],
+      h1.FD = h1_hat_FD(ai1.ext.v, ai2.ext.v, vi.all.ext.v, ai1.v, ai2.v,
                         m1, m2_all, n1, n2)
 
 
@@ -1225,43 +1332,24 @@ RFD.singletau.est <- function(data, FDdistM, tau, knots = 11, size = NULL, q = c
     output = reshape2::melt(output)
     colnames(output) = c("Order.q","prop.v","qmiNEXT_FD_singletau")
 
-    # if(nrow(m.inc.v) != 0){
-    #   aivi.inc = lapply(1:nrow(m.inc.v),
-    #                     function (k) mix.aivi.sample.FD.single(data, m.inc.v[k,1], m.inc.v[k,2],
-    #                                                            FDdistM = FDdistM, tau = tau))
-    #   un1 = un2 = sh12 = c()
-    #   for (i in 1:length(aivi.inc)) {
-    #     datanew = cbind(aivi.inc[[i]]$ai1_mat,aivi.inc[[i]]$ai2_mat)
-    #     datash = datanew[(datanew[,1]>0 & datanew[,2]>0), , drop=F]
-    #     dataun1 = datanew[(datanew[,1]>0 & datanew[,2]==0), , drop=F]
-    #     dataun2 = datanew[(datanew[,1]==0 & datanew[,2]>0), , drop=F]
-    #     un1[i] = sum(un_abun_FD(vi = aivi.inc[[i]]$vi1_mat,xi = aivi.inc[[i]]$ai1_mat, n = n1, m = m.inc.v[i,1]))
-    #     un2[i] = sum(un_abun_FD(vi = aivi.inc[[i]]$vi2_mat,xi = aivi.inc[[i]]$ai2_mat, n = n2, m = m.inc.v[i,2]))
-    #     sh12[i] =  sum(sh_abun_FD(vi = aivi.inc[[i]]$vi_all_mat,xi1 = aivi.inc[[i]]$ai1_mat, xi2 = aivi.inc[[i]]$ai2_mat,
-    #                               n1 = n1, m1 =  m.inc.v[i,1],
-    #                               n2 = n2, m2 =  m.inc.v[i,2]))
-    #
-    #   }
-    #
-    #
-    #   q0_ana = data.frame(prop.v = prop.inc ,
-    #                       q0_un1 = un1, q0_un2 = un2,
-    #                       q0_sh = sh12)
-    #   q0_ana = reshape2::melt(q0_ana,id = c('prop.v'))
-    #   colnames(q0_ana)[2:3] = c('Type','Value')
-    # }else{
-    #   q0_ana = NULL
-    # }
+    if(nrow(m.inc.v) != 0){
+      q0_ana = data.frame(prop.v = prop.inc ,
+                          q0_un1 = un1, q0_un2 = un2,
+                          q0_sh = sh12)
+      q0_ana = reshape2::melt(q0_ana,id = c('prop.v'))
+      colnames(q0_ana)[2:3] = c('Type','Value')
+    }else{
+      q0_ana = NULL
+    }
+
 
     if(nboot>0){
       data_gamma = rowSums(data)
       se = future.apply::future_lapply(1:nboot, function(boottime){
-        p_bt = iNEXT.beta3D:::bootstrap_population_multiple_assemblage(data,
-                                                                       data_gamma, "abundance")
+        p_bt = bootstrap_population_multiple_assemblage(data, data_gamma, "abundance")
 
         f0_hat = nrow(p_bt) - nrow(data)
-        distance_matrix_bt = iNEXT.beta3D:::Bootstrap_distance_matrix(rowSums(data),
-                                                                      FDdistM, f0_hat, "abundance")
+        distance_matrix_bt = Bootstrap_distance_matrix(rowSums(data), FDdistM, f0_hat, "abundance")
 
         data_bt = sapply(1:ncol(data), function(k) rmultinom(n = 1, size = sum(data[, k]), prob = p_bt[, k]))
 
@@ -1286,6 +1374,7 @@ RFD.singletau.est <- function(data, FDdistM, tau, knots = 11, size = NULL, q = c
         S <- nrow(data_bt)
         qlength <- length(q)
         out = list()
+        un1 = un2 = sh12 = c()
 
         for (zz in inc.idx) {
           ai1.v = aivi.sample.data[[zz]]$ai1_mat
@@ -1308,6 +1397,18 @@ RFD.singletau.est <- function(data, FDdistM, tau, knots = 11, size = NULL, q = c
               out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
             }
           }
+
+          ## q0 ana =========================================
+          datanew = cbind(ai1.v,ai2.v)
+          rownames(datanew) = names(vi.all.v) = rownames(data_bt)
+          datash = datanew[(ai1.v>0 & ai2.v>0), , drop=F]
+          dataun1 = datanew[(ai1.v>0 & ai2.v==0), , drop=F]
+          dataun2 = datanew[(ai1.v==0 & ai2.v>0), , drop=F]
+
+          un1[zz] = sum(un_abun_FD(vi = vi.all.v[rownames(dataun1)],xi = dataun1[,1], n = n1, m = m1.v[zz]))
+          un2[zz] = sum(un_abun_FD(vi = vi.all.v[rownames(dataun2)],xi = dataun2[,2], n = n2, m = m2.v[zz]))
+          sh12[zz] = sum(sh_abun_FD(vi = vi.all.v[rownames(datash)],xi1 = datash[,1],xi2 = datash[,2], n1 = n1,
+                                    m1 =  m1.v[zz], n2 = n2, m2 = m2.v[zz]))
         }
         # 新增外插 ========================================
         for (zz in ext.idx) {
@@ -1330,7 +1431,7 @@ RFD.singletau.est <- function(data, FDdistM, tau, knots = 11, size = NULL, q = c
 
           h0.FD = h0_hat_cpp_FD(ai1.ext.v,ai2.ext.v,vi.all.ext.v,m1,m2_s,n1,n2)
           ## 思考h1_hat_FD的xi1, xi2要放啥
-          h1.FD = h1_hat_FD(ai1.ext.v, ai2.ext.v, vi.all.ext.v, p_bind_bt[,1], p_bind_bt[,2],
+          h1.FD = h1_hat_FD(ai1.ext.v, ai2.ext.v, vi.all.ext.v, ai1.v, ai2.v,
                             m1, m2_all, n1, n2)
           ## ===================================================
           for (j in 1:qlength) {
@@ -1355,19 +1456,46 @@ RFD.singletau.est <- function(data, FDdistM, tau, knots = 11, size = NULL, q = c
 
 
         res = output$qmiNEXT_FD_singletau
-        res
-      },future.seed = NULL) %>% cbind()
-      se = abind::abind(se,along = 2)
-      se = apply(se, 1, sd)
 
-      output$LCL = output$qmiNEXT_FD_singletau - 1.96*se
-      output$UCL = output$qmiNEXT_FD_singletau + 1.96*se
+        ## q0_ana ==========================================
+        if(nrow(m.inc.v) != 0){
+          q0_ana = data.frame(prop.v = prop.inc ,
+                              q0_un1 = un1, q0_un2 = un2,
+                              q0_sh = sh12)
+          q0_ana = reshape2::melt(q0_ana,id = c('prop.v'))
+          colnames(q0_ana)[2:3] = c('Type','Value')
+          res_q0ana = q0_ana$Value
+        }else{
+          res_q0ana = NULL
+        }
+        return(list(allana = res,q0ana = res_q0ana))
+      },future.seed = NULL)
+      se_all = do.call(cbind,lapply(se, function(k) k$allana))
+      se_all = apply(se_all, 1, sd)
+
+      qtile <- qnorm(1 - (1 - conf)/2)
+      output$LCL = output$qmiNEXT_FD_singletau - qtile*se_all
+      output$UCL = output$qmiNEXT_FD_singletau + qtile*se_all
+
+      if(nrow(m.inc.v) != 0){
+        se_q0ana = do.call(cbind,lapply(se, function(k) k$q0ana))
+        se_q0ana = apply(se_q0ana, 1, sd)
+        q0_ana$LCL = q0_ana$Value - qtile*se_q0ana
+        q0_ana$UCL = q0_ana$Value + qtile*se_q0ana
+
+        q0_ana$LCL[q0_ana$LCL<0] = 0
+      }
 
     }else{
       output$LCL = NA
       output$UCL = NA
+      if(nrow(m.inc.v) != 0){
+        q0_ana$LCL = NA
+        q0_ana$UCL = NA
+      }
     }
-    return(list(out = output,ori.prop = prop.v,m.v = m.v,line_type = line_type))
+    return(list(out = output,q0_ana = q0_ana,ori.prop = prop.v,m.v = m.v,line_type = line_type,
+                threshold = tau))
   }
 
 

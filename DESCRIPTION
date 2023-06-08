@@ -24,4 +24,4 @@ Imports:
     iNEXT.3D
 LinkingTo:
     Rcpp
-Remotes: AnneChao/iNEXT.3D, AnneChao/iNEXT.beta3D
+Remotes: AnneChao/iNEXT.3D

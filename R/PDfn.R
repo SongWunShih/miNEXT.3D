@@ -233,7 +233,7 @@ RPD.obs <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q =
   return(list(out = output,ori.prop = prop.v,m.v = m.v,line_type = line_type))
 
 }
-RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q = c(0,1,2), nboot = 0) {
+RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q = c(0,1,2), conf = 0.95, nboot = 0) {
 
   n1 = sum(data[,1])
   n2 = sum(data[,2])
@@ -337,6 +337,11 @@ RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q =
       sum(sh_abun_PD(Li = Li.all.v[rownames(datash)],xi1 = datash[,1],xi2 = datash[,2], n1 = n1, m1 =  m1.v[i],
                      n2 = n2, m2 = m2.v[i]))
     })
+
+    un1 = un1/Tbar
+    un2 = un2/Tbar
+    sh12 = sh12/Tbar
+
     q0_ana = data.frame(prop.v = prop.v ,
                         q0_un1 = un1, q0_un2 = un2,
                         q0_sh = sh12)
@@ -347,7 +352,7 @@ RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q =
       data_gamma = rowSums(data)
       se = future.apply::future_lapply(1:nboot, function(boottime) {
         tree_bt = PDtree
-        p_bt = iNEXT.beta3D:::bootstrap_population_multiple_assemblage(data,data_gamma, "abundance")
+        p_bt = bootstrap_population_multiple_assemblage(data,data_gamma, "abundance")
         unseen_p = p_bt[-(1:nrow(data)), ] %>% matrix(ncol = ncol(data))
         #  =========================================================================
         if (nrow(p_bt) > nrow(data) & sum(unseen_p) > 0) {
@@ -495,6 +500,11 @@ RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q =
           sum(sh_abun_PD(Li = Li.all.v[rownames(datash)],xi1 = datash[,1],xi2 = datash[,2], n1 = n1, m1 =  m1.v[i],
                          n2 = n2, m2 = m2.v[i]))
         })
+
+        un1 = un1/Tbar
+        un2 = un2/Tbar
+        sh12 = sh12/Tbar
+
         q0_ana = data.frame(prop.v = prop.v ,
                             q0_un1 = un1, q0_un2 = un2,
                             q0_sh = sh12)
@@ -509,11 +519,14 @@ RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q =
       se_all = apply(se_all, 1, sd)
       se_q0ana = apply(se_q0ana, 1, sd)
 
-      output$LCL = output$qmiNEXT_PD - 1.96*se_all
-      output$UCL = output$qmiNEXT_PD + 1.96*se_all
+      qtile <- qnorm(1 - (1 - conf)/2)
+      output$LCL = output$qmiNEXT_PD - qtile*se_all
+      output$UCL = output$qmiNEXT_PD + qtile*se_all
 
-      q0_ana$LCL = q0_ana$Value - 1.96*se_q0ana
-      q0_ana$UCL = q0_ana$Value + 1.96*se_q0ana
+      q0_ana$LCL = q0_ana$Value - qtile*se_q0ana
+      q0_ana$UCL = q0_ana$Value + qtile*se_q0ana
+
+      q0_ana$LCL[q0_ana$LCL<0] = 0
     }else{
       output$LCL = NA
       output$UCL = NA
@@ -618,6 +631,11 @@ RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q =
         sum(sh_abun_PD(Li = Li.all.v[rownames(datash)],xi1 = datash[,1],xi2 = datash[,2], n1 = n1, m1 =  m.inc.v[i,1],
                        n2 = n2, m2 = m.inc.v[i,2]))
       })
+
+      un1 = un1/Tbar
+      un2 = un2/Tbar
+      sh12 = sh12/Tbar
+
       q0_ana = data.frame(prop.v = prop.inc ,
                           q0_un1 = un1, q0_un2 = un2,
                           q0_sh = sh12)
@@ -631,7 +649,7 @@ RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q =
       data_gamma = rowSums(data)
       se = future.apply::future_lapply(1:nboot, function(boottime) {
         tree_bt = PDtree
-        p_bt = iNEXT.beta3D:::bootstrap_population_multiple_assemblage(data,data_gamma, "abundance")
+        p_bt = bootstrap_population_multiple_assemblage(data,data_gamma, "abundance")
         unseen_p = p_bt[-(1:nrow(data)), ] %>% matrix(ncol = ncol(data))
         #  =========================================================================
         if (nrow(p_bt) > nrow(data) & sum(unseen_p) > 0) {
@@ -821,6 +839,11 @@ RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q =
             sum(sh_abun_PD(Li = Li.all.v[rownames(datash)],xi1 = datash[,1],xi2 = datash[,2], n1 = n1, m1 =  m.inc.v[i,1],
                            n2 = n2, m2 = m.inc.v[i,2]))
           })
+
+          un1 = un1/Tbar
+          un2 = un2/Tbar
+          sh12 = sh12/Tbar
+
           q0_ana = data.frame(prop.v = prop.inc ,
                               q0_un1 = un1, q0_un2 = un2,
                               q0_sh = sh12)
@@ -835,14 +858,18 @@ RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q =
       },future.seed = NULL)
       se_all = do.call(cbind,lapply(se, function(k) k$allana))
       se_all = apply(se_all, 1, sd)
-      output$LCL = output$qmiNEXT_PD - 1.96*se_all
-      output$UCL = output$qmiNEXT_PD + 1.96*se_all
+
+      qtile <- qnorm(1 - (1 - conf)/2)
+      output$LCL = output$qmiNEXT_PD - qtile*se_all
+      output$UCL = output$qmiNEXT_PD + qtile*se_all
 
       if(nrow(m.inc.v) != 0){
         se_q0ana = do.call(cbind,lapply(se, function(k) k$q0ana))
         se_q0ana = apply(se_q0ana, 1, sd)
-        q0_ana$LCL = q0_ana$Value - 1.96*se_q0ana
-        q0_ana$UCL = q0_ana$Value + 1.96*se_q0ana
+        q0_ana$LCL = q0_ana$Value - qtile*se_q0ana
+        q0_ana$UCL = q0_ana$Value + qtile*se_q0ana
+
+        q0_ana$LCL[q0_ana$LCL<0] = 0
       }
 
     }else{

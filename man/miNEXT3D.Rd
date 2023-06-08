@@ -7,15 +7,16 @@
 miNEXT3D(
   data,
   diversity,
+  q = c(0, 1, 2),
   knots = 11,
   size = NULL,
-  q = c(0, 1, 2),
+  nboot = 0,
+  conf = 0.95,
   PDtree,
   PDreftime = NULL,
   FDdistM,
-  FDtau = NULL,
   FDtype = "AUC",
-  nboot = 0
+  FDtau = NULL
 )
 }
 \arguments{
@@ -23,13 +24,17 @@ miNEXT3D(
 
 \item{diversity}{selection of diversity type: \code{'TD'} = Taxonomic diversity, \code{'PD'} = Phylogenetic diversity, and \code{'FD'} = Functional diversity.}
 
+\item{q}{a numerical vector specifying the diversity orders. Default is c(0, 1, 2).}
+
 \item{knots}{an integer specifying the number of \code{knots} (say K, default is 11).
 each knot represents a particular sample size for which mixture diversity estimate will be calculated.}
 
 \item{size}{an integer vector of sample sizes (number of individuals of original assemblage) for which mixture diversity estimates will be computed.
 If NULL, then diversity estimates will be computed for those sample sizes determined by the specified/default \code{knots}.}
 
-\item{q}{a numerical vector specifying the diversity orders. Default is c(0, 1, 2).}
+\item{nboot}{a positive integer specifying the number of bootstrap replications when assessing sampling uncertainty and constructing confidence intervals. Enter 0 to skip the bootstrap procedures. Default is 0.}
+
+\item{conf}{a positive number < 1 specifying the level of confidence interval. Default is 0.95.}
 
 \item{PDtree}{(required only when \code{diversity = "PD"}), a phylogenetic tree in Newick format for all observed species in the pooled assemblage.}
 
@@ -37,11 +42,9 @@ If NULL, then diversity estimates will be computed for those sample sizes determ
 
 \item{FDdistM}{(required only when \code{diversity = "FD"}), a species pairwise distance matrix for all species in the pooled assemblage.}
 
-\item{FDtau}{(required only when \code{diversity = "FD"} and \code{FDtype = "tau_values"}), a numerical vector between 0 and 1 specifying tau values (threshold levels).}
-
 \item{FDtype}{(required only when \code{diversity = "FD"}), select FD type: \code{FDtype = "tau_values"} for FD under specified threshold values, or \code{FDtype = "AUC"} (area under the curve of tau-profile) for an overall FD which integrates all threshold values between zero and one. Default is \code{"AUC"}}
 
-\item{nboot}{a positive integer specifying the number of bootstrap replications when assessing sampling uncertainty and constructing confidence intervals. Enter 0 to skip the bootstrap procedures. Default is 0.}
+\item{FDtau}{(required only when \code{diversity = "FD"} and \code{FDtype = "tau_values"}), a numerical vector between 0 and 1 specifying tau values (threshold levels).}
 }
 \value{
 a list of five objects: \code{$Mixture} for showing mixture diversity estimates for different size of Original and Transform assemblagt along with related statistics;
@@ -56,14 +59,14 @@ a list of five objects: \code{$Mixture} for showing mixture diversity estimates 
 # diversity = 'TD'
 data(dunes)
 data <- dunes$data
-data1 <- data[,c(2,1)]
+data1 <- data[,c(3,1)]
 output1 <- miNEXT3D(data1, diversity = 'TD', nboot = 10)
 output1
 
 # diversity = 'PD'
 data(dunes)
 data <- dunes$data
-data1 <- data[,c(2,1)]
+data1 <- data[,c(3,1)]
 tree <- dunes$tree
 output2 <- miNEXT3D(data1, diversity = 'PD', PDtree = tree, nboot = 10)
 output2
@@ -71,15 +74,15 @@ output2
 # diversity = 'FD' & FDtype = 'tau_values'
 data(dunes)
 data <- dunes$data
-data1 <- data[,c(2,1)]
+data1 <- data[,c(3,1)]
 distM <- as.matrix(dunes$dist)
-output3 <- miNEXT3D(data1, diversity = 'FD', FDdistM = distM, FDtau = 0.3, FDtype = 'tau_values', nboot = 10)
+output3 <- miNEXT3D(data1, diversity = 'FD', FDdistM = distM, FDtype = 'tau_values', nboot = 10)
 output3
 
 # diversity = 'FD' & FDtype = 'AUC'
 data(dunes)
 data <- dunes$data
-data1 <- data[,c(2,1)]
+data1 <- data[,c(3,1)]
 distM <- as.matrix(dunes$dist)
 output4 <- miNEXT3D(data1, diversity = 'FD', FDdistM = distM, FDtype = 'AUC', nboot = 0)
 output4
