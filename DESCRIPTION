@@ -20,7 +20,6 @@ Imports:
     magrittr,
     future.apply,
     phytools,
-    iNEXT.beta3D,
     iNEXT.3D
 LinkingTo:
     Rcpp
