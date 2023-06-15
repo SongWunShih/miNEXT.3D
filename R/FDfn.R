@@ -1149,9 +1149,22 @@ RFD.singletau.est <- function(data, FDdistM, tau = NULL, knots = 11, size = NULL
       data_gamma = rowSums(data)
       se = future.apply::future_lapply(1:nboot, function(boottime){
         p_bt = bootstrap_population_multiple_assemblage(data, data_gamma, "abundance")
-        f0_hat = nrow(p_bt) - nrow(data)
-        distance_matrix_bt = Bootstrap_distance_matrix(rowSums(data), FDdistM, f0_hat, "abundance")
-        data_bt = sapply(1:ncol(data), function(k) rmultinom(n = 1,size = sum(data[, k]), prob = p_bt[, k]))
+        ## 新增
+        if (nrow(p_bt) > nrow(data)){
+          unseen_p = p_bt[-(1:nrow(data)), ] %>% matrix(ncol = ncol(data))
+          unseen_name = sapply(1:nrow(unseen_p), function(i) paste0("unseen_",
+                                                                  i))
+          rownames(p_bt) = c(rownames(data), unseen_name)
+          f0_hat = nrow(p_bt) - nrow(data)
+          distance_matrix_bt = Bootstrap_distance_matrix(rowSums(data), FDdistM, f0_hat, "abundance")
+          rownames(distance_matrix_bt) = colnames(distance_matrix_bt) = rownames(p_bt)
+          data_bt = sapply(1:ncol(data), function(k) rmultinom(n = 1,size = sum(data[, k]), prob = p_bt[, k]))
+          rownames(data_bt) = rownames(p_bt)
+        }else {
+          distance_matrix_bt = FDdistM
+          data_bt = sapply(1:ncol(data), function(k) rmultinom(n = 1, size = sum(data[, k]), prob = p_bt[,k]))
+          rownames(data_bt) = rownames(data)
+        }
 
         aivi.sample.data = lapply(1:nrow(m.v), function (k) mix.aivi.sample.FD.single(data_bt, m1.v[k], m2.v[k], FDdistM = distance_matrix_bt,
                                                                                       tau = tau))
@@ -1348,13 +1361,22 @@ RFD.singletau.est <- function(data, FDdistM, tau = NULL, knots = 11, size = NULL
       data_gamma = rowSums(data)
       se = future.apply::future_lapply(1:nboot, function(boottime){
         p_bt = bootstrap_population_multiple_assemblage(data, data_gamma, "abundance")
-
-        f0_hat = nrow(p_bt) - nrow(data)
-        distance_matrix_bt = Bootstrap_distance_matrix(rowSums(data), FDdistM, f0_hat, "abundance")
-
-        data_bt = sapply(1:ncol(data), function(k) rmultinom(n = 1, size = sum(data[, k]), prob = p_bt[, k]))
-
-
+        ## 新增
+        if (nrow(p_bt) > nrow(data)){
+          unseen_p = p_bt[-(1:nrow(data)), ] %>% matrix(ncol = ncol(data))
+          unseen_name = sapply(1:nrow(unseen_p), function(i) paste0("unseen_",
+                                                                    i))
+          rownames(p_bt) = c(rownames(data), unseen_name)
+          f0_hat = nrow(p_bt) - nrow(data)
+          distance_matrix_bt = Bootstrap_distance_matrix(rowSums(data), FDdistM, f0_hat, "abundance")
+          rownames(distance_matrix_bt) = colnames(distance_matrix_bt) = rownames(p_bt)
+          data_bt = sapply(1:ncol(data), function(k) rmultinom(n = 1,size = sum(data[, k]), prob = p_bt[, k]))
+          rownames(data_bt) = rownames(p_bt)
+        }else {
+          distance_matrix_bt = FDdistM
+          data_bt = sapply(1:ncol(data), function(k) rmultinom(n = 1, size = sum(data[, k]), prob = p_bt[,k]))
+          rownames(data_bt) = rownames(data)
+        }
 
 
         aivi.sample.data = lapply(1:nrow(m.v), function (k) mix.aivi.sample.FD.single(data_bt, m1.v[k], m2.v[k], FDdistM = distance_matrix_bt,
