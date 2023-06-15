@@ -269,6 +269,7 @@ miNEXT3D = function(data, diversity, q = c(0,1,2), knots = 11, size = NULL, nboo
 
   }
   final = clean.real.fn(est,est.ori,est.trans,data,diversity,FDtype = FDtype)
+
   return(final)
 }
 
@@ -329,6 +330,13 @@ ggmiNEXT3D = function(out){
   } #把tau拔掉
   colnames(final)[3] = "miNEXT"
   data.sub = final[which(final$points == "Observed"),]
+  ## 線連接起來
+  tmp = dplyr::filter(final,points == "Observed")
+  if(nrow(tmp) != 0){
+    tmp$linetype = "Extrapolation"
+    final = rbind(final,tmp)
+  }
+  ## ============================================
 
   g = ggplot(final,aes(x = prop.v, y = miNEXT)) +
     geom_line(aes(col = Method,lty = linetype),size = 1.5)+
@@ -364,12 +372,12 @@ ggmiNEXT3D = function(out){
 
   com_final = rbind(dplyr::filter(final,Order.q == 0,Method == "Mixture"),q0_ana_clean)
   ## 線連接起來
-  tmp = filter(com_final,points == "Observed")
+  tmp = dplyr::filter(com_final,points == "Observed")
   if(nrow(tmp) != 0){
     tmp$linetype = "Extrapolation"
     com_final = rbind(com_final,tmp)
   }
-  ##
+  ## ============================================
   com_final$Method = factor(com_final$Method,levels = c("Mixture","q0_un1","q0_un2","q0_sh"),
                             labels = c("Mixture","Unique to original","Unique to transform","Shared"))
   data.sub1 = final[which(final$points == "Observed" & final$Order.q == 0 & final$Method == "Mixture"),]
