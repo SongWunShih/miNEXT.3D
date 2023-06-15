@@ -1121,9 +1121,9 @@ RFD.singletau.est <- function(data, FDdistM, tau = NULL, knots = 11, size = NULL
       ## q0 ana =========================================
       datanew = cbind(ai1.v,ai2.v)
       rownames(datanew) = names(vi.all.v) = rownames(data)
-      datash = datanew[(ai1.v>0 & ai2.v>0), , drop=F]
-      dataun1 = datanew[(ai1.v>0 & ai2.v==0), , drop=F]
-      dataun2 = datanew[(ai1.v==0 & ai2.v>0), , drop=F]
+      datash = datanew[(data[,1] > 0 & data[,2]>0), , drop=F]
+      dataun1 = datanew[(data[,1] > 0 & data[,2] == 0), , drop=F]
+      dataun2 = datanew[(data[,1] == 0 & data[,2] > 0), , drop=F]
 
       un1[zz] = sum(un_abun_FD(vi = vi.all.v[rownames(dataun1)],xi = dataun1[,1], n = n1, m = m1.v[zz]))
       un2[zz] = sum(un_abun_FD(vi = vi.all.v[rownames(dataun2)],xi = dataun2[,2], n = n2, m = m2.v[zz]))
@@ -1186,9 +1186,10 @@ RFD.singletau.est <- function(data, FDdistM, tau = NULL, knots = 11, size = NULL
           ## q0 ana =========================================
           datanew = cbind(ai1.v,ai2.v)
           rownames(datanew) = names(vi.all.v) = rownames(data_bt)
-          datash = datanew[(ai1.v>0 & ai2.v>0), , drop=F]
-          dataun1 = datanew[(ai1.v>0 & ai2.v==0), , drop=F]
-          dataun2 = datanew[(ai1.v==0 & ai2.v>0), , drop=F]
+
+          datash = datanew[(data_bt[,1] > 0 & data_bt[,2]>0), , drop=F]
+          dataun1 = datanew[(data_bt[,1] > 0 & data_bt[,2] == 0), , drop=F]
+          dataun2 = datanew[(data_bt[,1] == 0 & data_bt[,2] > 0), , drop=F]
 
           un1[zz] = sum(un_abun_FD(vi = vi.all.v[rownames(dataun1)],xi = dataun1[,1], n = n1, m = m1.v[zz]))
           un2[zz] = sum(un_abun_FD(vi = vi.all.v[rownames(dataun2)],xi = dataun2[,2], n = n2, m = m2.v[zz]))
@@ -1275,9 +1276,9 @@ RFD.singletau.est <- function(data, FDdistM, tau = NULL, knots = 11, size = NULL
       ## q0 ana =========================================
       datanew = cbind(ai1.v,ai2.v)
       rownames(datanew) = names(vi.all.v) = rownames(data)
-      datash = datanew[(ai1.v>0 & ai2.v>0), , drop=F]
-      dataun1 = datanew[(ai1.v>0 & ai2.v==0), , drop=F]
-      dataun2 = datanew[(ai1.v==0 & ai2.v>0), , drop=F]
+      datash = datanew[(data[,1] > 0 & data[,2]>0), , drop=F]
+      dataun1 = datanew[(data[,1] > 0 & data[,2] == 0), , drop=F]
+      dataun2 = datanew[(data[,1] == 0 & data[,2] > 0), , drop=F]
 
       un1[zz] = sum(un_abun_FD(vi = vi.all.v[rownames(dataun1)],xi = dataun1[,1], n = n1, m = m1.v[zz]))
       un2[zz] = sum(un_abun_FD(vi = vi.all.v[rownames(dataun2)],xi = dataun2[,2], n = n2, m = m2.v[zz]))
@@ -1401,9 +1402,9 @@ RFD.singletau.est <- function(data, FDdistM, tau = NULL, knots = 11, size = NULL
           ## q0 ana =========================================
           datanew = cbind(ai1.v,ai2.v)
           rownames(datanew) = names(vi.all.v) = rownames(data_bt)
-          datash = datanew[(ai1.v>0 & ai2.v>0), , drop=F]
-          dataun1 = datanew[(ai1.v>0 & ai2.v==0), , drop=F]
-          dataun2 = datanew[(ai1.v==0 & ai2.v>0), , drop=F]
+          datash = datanew[(data_bt[,1] > 0 & data_bt[,2]>0), , drop=F]
+          dataun1 = datanew[(data_bt[,1] > 0 & data_bt[,2] == 0), , drop=F]
+          dataun2 = datanew[(data_bt[,1] == 0 & data_bt[,2] > 0), , drop=F]
 
           un1[zz] = sum(un_abun_FD(vi = vi.all.v[rownames(dataun1)],xi = dataun1[,1], n = n1, m = m1.v[zz]))
           un2[zz] = sum(un_abun_FD(vi = vi.all.v[rownames(dataun2)],xi = dataun2[,2], n = n2, m = m2.v[zz]))
