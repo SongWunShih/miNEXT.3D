@@ -357,7 +357,8 @@ ggmiNEXT3D = function(out){
           legend.box.margin = margin(-10, -10, -5, -10),
           text = element_text(size = 12),
           plot.margin = unit(c(5.5, 5.5, 5.5, 5.5), "pt"),
-          strip.text = element_text(size = 14, face = "bold"))+
+          strip.text = element_text(size = 14, face = "bold"),
+          plot.title = element_text(size = 16, face = "bold"))+
     ylab(ylabtmp)
 
   q0_ana_clean = data.frame(Order.q = 0,
