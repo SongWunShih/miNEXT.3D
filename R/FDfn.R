@@ -1494,8 +1494,7 @@ RFD.singletau.est <- function(data, FDdistM, tau = NULL, knots = 11, size = NULL
         q0_ana$UCL = NA
       }
     }
-    return(list(out = output,q0_ana = q0_ana,ori.prop = prop.v,m.v = m.v,line_type = line_type,
-                threshold = tau))
+    return(list(out = output,q0_ana = q0_ana,ori.prop = prop.v,m.v = m.v,line_type = line_type))
   }
 
 
