@@ -61,9 +61,16 @@ double FD_h_fn_all(double m1, double m2, double n1, double n2, double vi, double
 // [[Rcpp::export]]
 double FD_h_hat_fn(int m1, int m2, int n1, int n2, NumericVector vi, NumericVector ai1, NumericVector ai2, double q, int S) {
   double output = 0;
-  for(int i = 0; i < S; i++) {
-    output += FD_h_fn_all(m1,m2,n1,n2,vi[i],ai1[i],ai2[i],q);
+  if (q == 0) {
+    for(int i = 0; i < S; i++) {
+      output += vi[i]*(1-exp(Rf_lchoose((n1-ai1[i]),m1)-Rf_lchoose(n1,m1)) * exp(Rf_lchoose((n2-ai2[i]),m2)-Rf_lchoose(n2,m2)));
+    }
+  } else {
+    for(int i = 0; i < S; i++) {
+      output += FD_h_fn_all(m1,m2,n1,n2,vi[i],ai1[i],ai2[i],q);
+    }
   }
+  
   return output;
 }
 
@@ -745,16 +752,16 @@ NumericVector sh_abun_PD(NumericVector Li, NumericVector xi1, NumericVector xi2,
   return(out);
 }
 
-// [[Rcpp::export]]
-NumericVector un_abun_FD(NumericVector vi,NumericVector xi,int n, int m){
-  int s = xi.size();
-  NumericVector out(s, 0.0);
+
+// NumericVector un_abun_FD(NumericVector vi,NumericVector xi,int n, int m){
+//   int s = xi.size();
+//   NumericVector out(s, 0.0);
   
-  for(int i=0;i<s;i++){
-    out[i] = vi[i]*(1-exp(Rf_lchoose((n-xi[i]),m)-Rf_lchoose(n,m)));
-  }
-  return(out);
-}
+//   for(int i=0;i<s;i++){
+//     out[i] = vi[i]*(1-exp(Rf_lchoose((n-xi[i]),m)-Rf_lchoose(n,m)));
+//   }
+//   return(out);
+// }
 
 // [[Rcpp::export]]
 NumericVector sh_abun_FD(NumericVector vi, NumericVector xi1, NumericVector xi2, int n1, int m1, int n2, int m2){

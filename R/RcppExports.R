@@ -125,10 +125,6 @@ sh_abun_PD <- function(Li, xi1, xi2, n1, m1, n2, m2) {
     .Call(`_miNEXT_3D_sh_abun_PD`, Li, xi1, xi2, n1, m1, n2, m2)
 }
 
-un_abun_FD <- function(vi, xi, n, m) {
-    .Call(`_miNEXT_3D_un_abun_FD`, vi, xi, n, m)
-}
-
 sh_abun_FD <- function(vi, xi1, xi2, n1, m1, n2, m2) {
     .Call(`_miNEXT_3D_sh_abun_FD`, vi, xi1, xi2, n1, m1, n2, m2)
 }

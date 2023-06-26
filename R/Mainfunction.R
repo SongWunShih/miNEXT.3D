@@ -76,6 +76,9 @@ miNEXT3D = function(data, diversity, q = c(0,1,2), knots = 11, size = NULL, nboo
                      PDtree, PDreftime = NULL, FDdistM, FDtype = 'AUC', FDtau = NULL){
 
   est = NULL
+  if (is.null(colnames(data))) {
+    colnames(data) <- c("Assemblage1","Assemblage2")
+  }
 
   if(diversity == 'TD'){
     est = RTD.est(data, knots = knots, size = size, q = q, conf = conf, nboot = nboot)
@@ -142,16 +145,16 @@ miNEXT3D = function(data, diversity, q = c(0,1,2), knots = 11, size = NULL, nboo
       est.final$points[which(est.final$prop.v > checkpoint)] = 'Rarefaction'
       est.final$points[which(est.final$prop.v < checkpoint)] = 'Extrapolation'
       est.final$points[which(est.final$prop.v == checkpoint)] = 'Observed'
-      est.final$Method = "Mixture"
+      est.final$Assemblage = "Mixture"
     }else{
       est.final$linetype = est.final$points = NA
       est.final$linetype = 'Rarefaction'
       est.final$points = 'Rarefaction'
-      est.final$Method = "Mixture"
+      est.final$Assemblage = "Mixture"
     }
 
     if(diversity == 'TD'){
-      est.final = select(est.final,Order.q,m1,m2,prop.v,qmiNEXT_TD,LCL,UCL,points,linetype,Method)
+      est.final = select(est.final,Order.q,m1,m2,prop.v,qmiNEXT_TD,LCL,UCL,points,linetype,Assemblage)
       tmp = est.ori$iNextEst$size_based
       type = tmp$Method
       type[type == 'Observed'] = "Rarefaction"
@@ -163,7 +166,7 @@ miNEXT3D = function(data, diversity, q = c(0,1,2), knots = 11, size = NULL, nboo
                               UCL = tmp$qD.UCL,
                               points = tmp$Method,
                               linetype = type,
-                              Method = 'Original')
+                              Assemblage = colnames(data)[1])
 
       tmp = est.trans$iNextEst$size_based
       type = tmp$Method
@@ -176,9 +179,9 @@ miNEXT3D = function(data, diversity, q = c(0,1,2), knots = 11, size = NULL, nboo
                                 UCL = tmp$qD.UCL,
                                 points = tmp$Method,
                                 linetype = type,
-                                Method = 'Transform')
+                                Assemblage = colnames(data)[2])
     }else if(diversity == 'PD'){
-      est.final = select(est.final,Order.q,m1,m2,prop.v,qmiNEXT_PD,LCL,UCL,points,linetype,Method)
+      est.final = select(est.final,Order.q,m1,m2,prop.v,qmiNEXT_PD,LCL,UCL,points,linetype,Assemblage)
       tmp = est.ori$PDiNextEst$size_based
       type = tmp$Method
       type[type == 'Observed'] = "Rarefaction"
@@ -190,7 +193,7 @@ miNEXT3D = function(data, diversity, q = c(0,1,2), knots = 11, size = NULL, nboo
                               UCL = tmp$qPD.UCL,
                               points = tmp$Method,
                               linetype = type,
-                              Method = 'Original')
+                              Assemblage = colnames(data)[1])
 
       tmp = est.trans$PDiNextEst$size_based
       type = tmp$Method
@@ -203,9 +206,9 @@ miNEXT3D = function(data, diversity, q = c(0,1,2), knots = 11, size = NULL, nboo
                                 UCL = tmp$qPD.UCL,
                                 points = tmp$Method,
                                 linetype = type,
-                                Method = 'Transform')
+                                Assemblage = colnames(data)[2])
     }else if(diversity == 'FD' & FDtype == 'AUC'){
-      est.final = select(est.final,Order.q,m1,m2,prop.v,qmiNEXT_FD,LCL,UCL,points,linetype,Method)
+      est.final = select(est.final,Order.q,m1,m2,prop.v,qmiNEXT_FD,LCL,UCL,points,linetype,Assemblage)
       tmp = est.ori$AUCiNextEst$size_based
       type = tmp$Method
       type[type == 'Observed'] = "Rarefaction"
@@ -217,7 +220,7 @@ miNEXT3D = function(data, diversity, q = c(0,1,2), knots = 11, size = NULL, nboo
                               UCL = tmp$qAUC.UCL,
                               points = tmp$Method,
                               linetype = type,
-                              Method = 'Original')
+                              Assemblage = colnames(data)[1])
 
       tmp = est.trans$AUCiNextEst$size_based
       type = tmp$Method
@@ -230,9 +233,9 @@ miNEXT3D = function(data, diversity, q = c(0,1,2), knots = 11, size = NULL, nboo
                                 UCL = tmp$qAUC.UCL,
                                 points = tmp$Method,
                                 linetype = type,
-                                Method = 'Transform')
+                                Assemblage = colnames(data)[2])
     }else if(diversity == 'FD' & FDtype == 'tau_values'){
-      est.final = select(est.final,Order.q,m1,m2,prop.v,qmiNEXT_FD_singletau,LCL,UCL,points,linetype,Method)
+      est.final = select(est.final,Order.q,m1,m2,prop.v,qmiNEXT_FD_singletau,LCL,UCL,points,linetype,Assemblage)
       est.final$Tau = est.ori$FDInfo$Tau
       tmp = est.ori$FDiNextEst$size_based
       type = tmp$Method
@@ -245,7 +248,7 @@ miNEXT3D = function(data, diversity, q = c(0,1,2), knots = 11, size = NULL, nboo
                               UCL = tmp$qFD.UCL,
                               points = tmp$Method,
                               linetype = type,
-                              Method = 'Original',
+                              Assemblage = colnames(data)[1],
                               Tau = est.final$Tau)
 
       tmp = est.trans$FDiNextEst$size_based
@@ -259,13 +262,13 @@ miNEXT3D = function(data, diversity, q = c(0,1,2), knots = 11, size = NULL, nboo
                                 UCL = tmp$qFD.UCL,
                                 points = tmp$Method,
                                 linetype = type,
-                                Method = 'Transform',
+                                Assemblage = colnames(data)[2],
                                 Tau = est.final$Tau)
     }
     est.trans.df = dplyr::filter(est.trans.df,prop.v <= 100)
 
 
-    return(list(Mixture = est.final, Orignal = est.ori.df, Transform = est.trans.df, q0_ana = q0_ana))
+    return(list(Mixture = est.final, Original = est.ori.df, Transform = est.trans.df, q0_ana = q0_ana))
 
   }
   final = clean.real.fn(est,est.ori,est.trans,data,diversity,FDtype = FDtype)
@@ -320,10 +323,17 @@ miNEXT3D = function(data, diversity, q = c(0,1,2), knots = 11, size = NULL, nboo
 #' @export
 ggmiNEXT3D = function(out){
   tmp1 = subset(out$Mixture,select = -c(m1,m2))
-  tmp2 = subset(out$Orignal,select = -c(m1))
+  tmp2 = subset(out$Original,select = -c(m1))
   tmp3 = subset(out$Transform,select = -c(m2))
   final = rbind(tmp1,tmp2,tmp3)
-  final$Method = factor(final$Method,levels = c('Mixture','Original','Transform'))
+  final$Assemblage = factor(final$Assemblage,
+                            levels = c("Mixture",
+                                       paste0(out$Original$Assemblage[1]),
+                                       paste0(out$Transform$Assemblage[1])),
+                            labels = c("Mixture",
+                                       paste0(out$Original$Assemblage[1],"(Original)"),
+                                       paste0(out$Transform$Assemblage[1],"(Transform)")))
+  assem_name = unique(final$Assemblage)
   ylabtmp = colnames(final)[3]
   if (ylabtmp == "qmiNEXT_FD_singletau"){
     final = final[,-9]
@@ -338,17 +348,21 @@ ggmiNEXT3D = function(out){
   }
   ## ============================================
 
-  g = ggplot(final,aes(x = prop.v, y = miNEXT)) +
-    geom_line(aes(col = Method,lty = linetype),size = 1.5)+
-    geom_ribbon(aes(x = prop.v, ymin = LCL, ymax = UCL,fill = Method), alpha = 0.3)+
-    geom_point(aes(col = Method),size = 3,data = data.sub)+
-    facet_wrap(~Order.q,scales = "free_y",labeller = labeller(Order.q = c(`0` = "q = 0", `1` = "q = 1", `2` = "q = 2"))) +
-    scale_linetype_manual(values=c("Rarefaction" = "solid","Extrapolation" = "dashed"))+
-    scale_color_manual(values=c("Mixture"= "#C0392B","Original" = "black", "Transform" = "#3498DB"))+
-    scale_fill_manual(values=c("Mixture"= "#C0392B","Original" = "black", "Transform" = "#3498DB"))+
-    scale_x_continuous(name = paste0('Number of individuals',"\n","(Proportion % in original habitat)"),
-                       breaks = round(seq(0,100,length.out = 5)),
-                       labels = paste0(round(seq(0,max(out$Mixture$m1),length.out = 5)), "\n(", round(seq(0,100,length.out = 5), 1), "%)"))+
+  g = ggplot(final, aes(x = prop.v, y = miNEXT)) +
+    geom_line(aes(col = Assemblage, lty = linetype), size = 1.5) +
+    geom_ribbon(aes(x = prop.v, ymin = LCL, ymax = UCL, fill = Assemblage), alpha = 0.3) +
+    geom_point(aes(col = Assemblage), size = 3, data = data.sub) +
+    facet_wrap(~Order.q, scales = "free_y", labeller = labeller(Order.q = c(`0` = "q = 0", `1` = "q = 1", `2` = "q = 2"))) +
+    scale_linetype_manual(values = c("Rarefaction" = "solid", "Extrapolation" = "dashed")) +
+    scale_color_manual(values = c("#C0392B", "black", "#3498DB"),
+                       breaks = c("Mixture", paste0(assem_name[2]), paste0(assem_name[3])),
+                       labels = c("Mixture", paste0(assem_name[2]), paste0(assem_name[3]))) +
+    scale_fill_manual(values = c("#C0392B", "black", "#3498DB"),
+                      breaks = c("Mixture", paste0(assem_name[2]), paste0(assem_name[3])),
+                      labels = c("Mixture", paste0(assem_name[2]), paste0(assem_name[3]))) +
+    scale_x_continuous(name = paste0('Number of individuals', "\n", "(Proportion % in original habitat)"),
+                       breaks = round(seq(0, 100, length.out = 5)),
+                       labels = paste0(round(seq(0, max(out$Mixture$m1), length.out = 5)), "\n(", round(seq(0, 100, length.out = 5), 1), "%)")) +
     theme(legend.position = "bottom",
           legend.box = "vertical",
           legend.title = element_blank(),
@@ -358,7 +372,7 @@ ggmiNEXT3D = function(out){
           text = element_text(size = 12),
           plot.margin = unit(c(5.5, 5.5, 5.5, 5.5), "pt"),
           strip.text = element_text(size = 14, face = "bold"),
-          plot.title = element_text(size = 16, face = "bold"))+
+          plot.title = element_text(size = 16, face = "bold")) +
     ylab(ylabtmp)
 
   q0_ana_clean = data.frame(Order.q = 0,
@@ -368,10 +382,10 @@ ggmiNEXT3D = function(out){
                             UCL = out$q0_ana$UCL,
                             points = 'Rarefaction',
                             linetype = 'Rarefaction',
-                            Method = out$q0_ana$Type)
+                            Assemblage = out$q0_ana$Type)
 
 
-  com_final = rbind(dplyr::filter(final,Order.q == 0,Method == "Mixture"),q0_ana_clean)
+  com_final = rbind(dplyr::filter(final,Order.q == 0,Assemblage == "Mixture"),q0_ana_clean)
   ## 線連接起來
   tmp = dplyr::filter(com_final,points == "Observed")
   if(nrow(tmp) != 0){
@@ -379,13 +393,13 @@ ggmiNEXT3D = function(out){
     com_final = rbind(com_final,tmp)
   }
   ## ============================================
-  com_final$Method = factor(com_final$Method,levels = c("Mixture","q0_un1","q0_un2","q0_sh"),
+  com_final$Assemblage = factor(com_final$Assemblage,levels = c("Mixture","q0_un1","q0_un2","q0_sh"),
                             labels = c("Mixture","Unique to original","Unique to transform","Shared"))
   data.sub1 = final[which(final$points == "Observed" & final$Order.q == 0 & final$Method == "Mixture"),]
   g1 = ggplot(com_final,aes(x = prop.v, y = miNEXT)) +
-    geom_line(aes(col = Method,lty = linetype),size = 1.5)+
-    geom_ribbon(aes(x = prop.v, ymin = LCL, ymax = UCL,fill = Method), alpha = 0.3)+
-    geom_point(aes(col = Method),size = 3,data = data.sub1)+
+    geom_line(aes(col = Assemblage,lty = linetype),size = 1.5)+
+    geom_ribbon(aes(x = prop.v, ymin = LCL, ymax = UCL,fill = Assemblage), alpha = 0.3)+
+    geom_point(aes(col = Assemblage),size = 3,data = data.sub1)+
     scale_linetype_manual(values=c("Rarefaction" = "solid","Extrapolation" = "dashed"))+
     scale_color_manual(values=c("Mixture"= "#C0392B",
                                 "Unique to original" = "black", "Unique to transform" = "#3498DB", "Shared" = "purple"))+

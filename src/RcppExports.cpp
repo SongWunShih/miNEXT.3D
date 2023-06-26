@@ -534,20 +534,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// un_abun_FD
-NumericVector un_abun_FD(NumericVector vi, NumericVector xi, int n, int m);
-RcppExport SEXP _miNEXT_3D_un_abun_FD(SEXP viSEXP, SEXP xiSEXP, SEXP nSEXP, SEXP mSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type vi(viSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type xi(xiSEXP);
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< int >::type m(mSEXP);
-    rcpp_result_gen = Rcpp::wrap(un_abun_FD(vi, xi, n, m));
-    return rcpp_result_gen;
-END_RCPP
-}
 // sh_abun_FD
 NumericVector sh_abun_FD(NumericVector vi, NumericVector xi1, NumericVector xi2, int n1, int m1, int n2, int m2);
 RcppExport SEXP _miNEXT_3D_sh_abun_FD(SEXP viSEXP, SEXP xi1SEXP, SEXP xi2SEXP, SEXP n1SEXP, SEXP m1SEXP, SEXP n2SEXP, SEXP m2SEXP) {
@@ -598,7 +584,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_miNEXT_3D_sh_abun", (DL_FUNC) &_miNEXT_3D_sh_abun, 6},
     {"_miNEXT_3D_un_abun_PD", (DL_FUNC) &_miNEXT_3D_un_abun_PD, 4},
     {"_miNEXT_3D_sh_abun_PD", (DL_FUNC) &_miNEXT_3D_sh_abun_PD, 7},
-    {"_miNEXT_3D_un_abun_FD", (DL_FUNC) &_miNEXT_3D_un_abun_FD, 4},
     {"_miNEXT_3D_sh_abun_FD", (DL_FUNC) &_miNEXT_3D_sh_abun_FD, 7},
     {NULL, NULL, 0}
 };
