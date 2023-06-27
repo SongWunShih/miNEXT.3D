@@ -9,8 +9,8 @@ FD_h_fn_all <- function(m1, m2, n1, n2, vi, ai1, ai2, q) {
     .Call(`_miNEXT_3D_FD_h_fn_all`, m1, m2, n1, n2, vi, ai1, ai2, q)
 }
 
-FD_h_hat_fn <- function(m1, m2, n1, n2, vi, ai1, ai2, q, S) {
-    .Call(`_miNEXT_3D_FD_h_hat_fn`, m1, m2, n1, n2, vi, ai1, ai2, q, S)
+FD_h_hat_fn <- function(m1, m2, n1, n2, vi, ai1, ai2, q) {
+    .Call(`_miNEXT_3D_FD_h_hat_fn`, m1, m2, n1, n2, vi, ai1, ai2, q)
 }
 
 PD_g_fn <- function(m1, m2, n1, n2, k1, k2, Li, ai1, ai2) {
@@ -21,8 +21,8 @@ PD_g_fn_all <- function(m1, m2, n1, n2, Li, ai1, ai2, q, Tbar) {
     .Call(`_miNEXT_3D_PD_g_fn_all`, m1, m2, n1, n2, Li, ai1, ai2, q, Tbar)
 }
 
-PD_g_hat_fn <- function(m1, m2, n1, n2, Li, ai1, ai2, q, S, Tbar) {
-    .Call(`_miNEXT_3D_PD_g_hat_fn`, m1, m2, n1, n2, Li, ai1, ai2, q, S, Tbar)
+PD_g_hat_fn <- function(m1, m2, n1, n2, Li, ai1, ai2, q, Tbar) {
+    .Call(`_miNEXT_3D_PD_g_hat_fn`, m1, m2, n1, n2, Li, ai1, ai2, q, Tbar)
 }
 
 TD_f_fn <- function(m1, m2, n1, n2, k1, k2, ai1, ai2) {
@@ -33,8 +33,8 @@ TD_f_fn_all <- function(m1, m2, n1, n2, ai1, ai2, q) {
     .Call(`_miNEXT_3D_TD_f_fn_all`, m1, m2, n1, n2, ai1, ai2, q)
 }
 
-TD_f_hat_fn <- function(m1, m2, n1, n2, ai1, ai2, q, S) {
-    .Call(`_miNEXT_3D_TD_f_hat_fn`, m1, m2, n1, n2, ai1, ai2, q, S)
+TD_f_hat_fn <- function(m1, m2, n1, n2, ai1, ai2, q) {
+    .Call(`_miNEXT_3D_TD_f_hat_fn`, m1, m2, n1, n2, ai1, ai2, q)
 }
 
 h0_cpp <- function(pi1, pi2, m1, m2s, n2) {

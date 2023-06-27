@@ -23,7 +23,9 @@ DetAbu <- function(x, zero=FALSE){
 }
 
 PDq2<-function(x1,x2,Li.all,Tbar,m1,m2,n1,n2){
-
+  x1 = x1[Li.all>0]
+  x2 = x2[Li.all>0]
+  Li.all = Li.all[Li.all>0]
   D2 = 0
   if(m1 !=0 || m2!=0){
     part1 = 1/((m1+m2)*Tbar)^2*sum(m1/n1*Li.all*x1 + m2/n2*Li.all*x2)
@@ -285,7 +287,7 @@ RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q =
   reft = Liai.sample.data$refT
 
   if(n1<=n2){
-    B <- length(Liai.sample.data$Li_all.v) ## 注意是B不是S
+    # B <- length(Liai.sample.data$Li_all.v) ## 注意是B不是S
     qlength <- length(q)
     out = list()
     ai1.v = Liai.sample.data$ai1.v
@@ -301,13 +303,13 @@ RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q =
 
       for (j in 1:qlength) {
         if (q[j] == 0) {
-          out[[zz]][j,1] <- PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], B, Tbar)
+          out[[zz]][j,1] <- PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], Tbar)
         } else if (q[j] == 1) {
-          out[[zz]][j,1] <- exp(PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], B, Tbar))
+          out[[zz]][j,1] <- exp(PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], Tbar))
         } else if (q[j] == 2) {
           out[[zz]][j,1] <- PDq2(ai1.v, ai2.v, Li.all.v, Tbar, m1, m2, n1, n2)
         } else {
-          out[[zz]][j,1] <- PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], B, Tbar)^(1/(1-q[j]))
+          out[[zz]][j,1] <- PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], Tbar)^(1/(1-q[j]))
         }
 
         out[[zz]][j,1] = out[[zz]][j,1]/Tbar
@@ -463,13 +465,13 @@ RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q =
 
           for (j in 1:qlength) {
             if (q[j] == 0) {
-              out[[zz]][j,1] <- PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], B, Tbar)
+              out[[zz]][j,1] <- PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], Tbar)
             } else if (q[j] == 1) {
-              out[[zz]][j,1] <- exp(PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], B, Tbar))
+              out[[zz]][j,1] <- exp(PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], Tbar))
             } else if (q[j] == 2) {
               out[[zz]][j,1] <- PDq2(ai1.v, ai2.v, Li.all.v, Tbar, m1, m2, n1, n2)
             } else {
-              out[[zz]][j,1] <- PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], B, Tbar)^(1/(1-q[j]))
+              out[[zz]][j,1] <- PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], Tbar)^(1/(1-q[j]))
             }
 
             out[[zz]][j,1] = out[[zz]][j,1]/Tbar
@@ -548,7 +550,7 @@ RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q =
     }
 
     # =================================================================
-    B <- length(Liai.sample.data$Li_all.v) ## 注意是B不是S
+    # B <- length(Liai.sample.data$Li_all.v) ## 注意是B不是S
     qlength <- length(q)
     out = list()
     ai1.v = Liai.sample.data$ai1.v
@@ -566,13 +568,13 @@ RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q =
 
       for (j in 1:qlength) {
         if (q[j] == 0) {
-          out[[zz]][j,1] <- PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], B, Tbar)
+          out[[zz]][j,1] <- PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], Tbar)
         } else if (q[j] == 1) {
-          out[[zz]][j,1] <- exp(PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], B, Tbar))
+          out[[zz]][j,1] <- exp(PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], Tbar))
         } else if (q[j] == 2) {
           out[[zz]][j,1] <- PDq2(ai1.v, ai2.v, Li.all.v, Tbar, m1, m2, n1, n2)
         } else {
-          out[[zz]][j,1] <- PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], B, Tbar)^(1/(1-q[j]))
+          out[[zz]][j,1] <- PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], Tbar)^(1/(1-q[j]))
         }
 
         out[[zz]][j,1] = out[[zz]][j,1]/Tbar
@@ -593,13 +595,13 @@ RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q =
       ## ===================================================
       for (j in 1:qlength) {
         if (q[j] == 0) {
-          out[[zz]][j,1] <- PD_g_hat_fn(m1, n2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], B, Tbar) + h0.PD
+          out[[zz]][j,1] <- PD_g_hat_fn(m1, n2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], Tbar) + h0.PD
         } else if (q[j] == 1) {
-          out[[zz]][j,1] <- exp(PD_g_hat_fn(m1, n2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], B, Tbar) + h1.PD)
+          out[[zz]][j,1] <- exp(PD_g_hat_fn(m1, n2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], Tbar) + h1.PD)
         } else if (q[j] == 2) {
           out[[zz]][j,1] <- PDq2(ai1.v, ai2.v, Li.all.v, Tbar, m1, m2_all, n1, n2)
         } else {
-          out[[zz]][j,1] <- PD_g_hat_fn(m1, n2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], B, Tbar)^(1/(1-q[j]))
+          out[[zz]][j,1] <- PD_g_hat_fn(m1, n2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], Tbar)^(1/(1-q[j]))
         }
 
         out[[zz]][j,1] = out[[zz]][j,1]/Tbar
@@ -754,7 +756,7 @@ RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q =
         }
 
         # =================================================================
-        B <- length(Liai.sample.data$Li_all.v) ## 注意是B不是S
+        # B <- length(Liai.sample.data$Li_all.v) ## 注意是B不是S
         qlength <- length(q)
         out = list()
         ai1.v = Liai.sample.data$ai1.v
@@ -773,13 +775,13 @@ RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q =
 
           for (j in 1:qlength) {
             if (q[j] == 0) {
-              out[[zz]][j,1] <- PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], B, Tbar)
+              out[[zz]][j,1] <- PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], Tbar)
             } else if (q[j] == 1) {
-              out[[zz]][j,1] <- exp(PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], B, Tbar))
+              out[[zz]][j,1] <- exp(PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], Tbar))
             } else if (q[j] == 2) {
               out[[zz]][j,1] <- PDq2(ai1.v, ai2.v, Li.all.v, Tbar, m1, m2, n1, n2)
             } else {
-              out[[zz]][j,1] <- PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], B, Tbar)^(1/(1-q[j]))
+              out[[zz]][j,1] <- PD_g_hat_fn(m1, m2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], Tbar)^(1/(1-q[j]))
             }
 
             out[[zz]][j,1] = out[[zz]][j,1]/Tbar
@@ -800,13 +802,13 @@ RPD.est <- function(data, PDtree, PDreftime = NULL, knots = 11, size = NULL, q =
           ## ===================================================
           for (j in 1:qlength) {
             if (q[j] == 0) {
-              out[[zz]][j,1] <- PD_g_hat_fn(m1, n2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], B, Tbar) + h0.PD
+              out[[zz]][j,1] <- PD_g_hat_fn(m1, n2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], Tbar) + h0.PD
             } else if (q[j] == 1) {
-              out[[zz]][j,1] <- exp(PD_g_hat_fn(m1, n2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], B, Tbar) + h1.PD)
+              out[[zz]][j,1] <- exp(PD_g_hat_fn(m1, n2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], Tbar) + h1.PD)
             } else if (q[j] == 2) {
               out[[zz]][j,1] <- PDq2(ai1.v, ai2.v, Li.all.v, Tbar, m1, m2_all, n1, n2)
             } else {
-              out[[zz]][j,1] <- PD_g_hat_fn(m1, n2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], B, Tbar)^(1/(1-q[j]))
+              out[[zz]][j,1] <- PD_g_hat_fn(m1, n2, n1, n2, Li.all.v, ai1.v, ai2.v, q[j], Tbar)^(1/(1-q[j]))
             }
 
             out[[zz]][j,1] = out[[zz]][j,1]/Tbar

@@ -106,6 +106,9 @@ Bootstrap_distance_matrix <- function (data, distance_matrix, f0.hat, datatype){
 }
 
 FDq2<-function(x1,x2,vi.all,m1,m2,n1,n2){
+  x1 = x1[vi.all>0]
+  x2 = x2[vi.all>0]
+  vi.all = vi.all[vi.all>0]
 
   D2 = 0
   if(m1 !=0 || m2!=0){
@@ -447,7 +450,7 @@ RFD.est <- function(data, FDdistM, FDtau = NULL, knots = 11, size = NULL, q = c(
 
     output.list = lapply(1:length(tau), function(tt) {
       # Li.v = apply(Lis, 1, function(x) x[1]*x[2])
-      S <- nrow(data)
+      # S <- nrow(data)
       qlength <- length(q)
       out = list()
       un1 = un2 = sh12 = c()
@@ -464,13 +467,13 @@ RFD.est <- function(data, FDdistM, FDtau = NULL, knots = 11, size = NULL, q = c(
 
         for (j in 1:qlength) {
           if (q[j] == 0) {
-            out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)
+            out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])
           } else if (q[j] == 1) {
-            out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S))
+            out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j]))
           } else if (q[j] == 2) {
             out[[zz]][j,1] <- FDq2(ai1.v, ai2.v, vi.all.v, m1, m2, n1, n2)
           } else {
-            out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
+            out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])^(1/(1-q[j]))
           }
         }
 
@@ -578,8 +581,7 @@ RFD.est <- function(data, FDdistM, FDtau = NULL, knots = 11, size = NULL, q = c(
         aivi.sample.data = lapply(1:nrow(m.v), function (k) mix.aivi.sample.FD(data_bt, m1.v[k], m2.v[k], FDdistM = distance_matrix_bt,
                                                                                tau = tau))
         output.list = lapply(1:length(tau), function(tt) {
-          # Li.v = apply(Lis, 1, function(x) x[1]*x[2])
-          S <- nrow(data_bt)
+          # S <- nrow(data_bt)
           qlength <- length(q)
           out = list()
           un1 = un2 = sh12 = c()
@@ -596,13 +598,13 @@ RFD.est <- function(data, FDdistM, FDtau = NULL, knots = 11, size = NULL, q = c(
 
             for (j in 1:qlength) {
               if (q[j] == 0) {
-                out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)
+                out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])
               } else if (q[j] == 1) {
-                out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S))
+                out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j]))
               } else if (q[j] == 2) {
                 out[[zz]][j,1] <- FDq2(ai1.v, ai2.v, vi.all.v, m1, m2, n1, n2)
               } else {
-                out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
+                out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])^(1/(1-q[j]))
               }
             }
             ## q0 ana =========================================
@@ -725,8 +727,8 @@ RFD.est <- function(data, FDdistM, FDtau = NULL, knots = 11, size = NULL, q = c(
 
 
     output.list = lapply(1:length(tau), function(tt) {
-      # Li.v = apply(Lis, 1, function(x) x[1]*x[2])
-      S <- nrow(data)
+
+      # S <- nrow(data)
       qlength <- length(q)
       out = list()
       un1 = un2 = sh12 = c()
@@ -743,13 +745,13 @@ RFD.est <- function(data, FDdistM, FDtau = NULL, knots = 11, size = NULL, q = c(
 
         for (j in 1:qlength) {
           if (q[j] == 0) {
-            out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)
+            out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])
           } else if (q[j] == 1) {
-            out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S))
+            out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j]))
           } else if (q[j] == 2) {
             out[[zz]][j,1] <- FDq2(ai1.v, ai2.v, vi.all.v, m1, m2, n1, n2)
           } else {
-            out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
+            out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])^(1/(1-q[j]))
           }
         }
         ## q0 ana =========================================
@@ -796,13 +798,13 @@ RFD.est <- function(data, FDdistM, FDtau = NULL, knots = 11, size = NULL, q = c(
         ## ===================================================
         for (j in 1:qlength) {
           if (q[j] == 0) {
-            out[[zz]][j,1] <- FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S) + h0.FD
+            out[[zz]][j,1] <- FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j]) + h0.FD
           } else if (q[j] == 1) {
-            out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S) + h1.FD)
+            out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j]) + h1.FD)
           } else if (q[j] == 2) {
             out[[zz]][j,1] <- FDq2(ai1.v, ai2.v, vi.all.v, m1, m2_all, n1, n2)
           } else {
-            out[[zz]][j,1] <- FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
+            out[[zz]][j,1] <- FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])^(1/(1-q[j]))
           }
         }
       }
@@ -934,13 +936,13 @@ RFD.est <- function(data, FDdistM, FDtau = NULL, knots = 11, size = NULL, q = c(
 
             for (j in 1:qlength) {
               if (q[j] == 0) {
-                out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)
+                out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])
               } else if (q[j] == 1) {
-                out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S))
+                out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j]))
               } else if (q[j] == 2) {
                 out[[zz]][j,1] <- FDq2(ai1.v, ai2.v, vi.all.v, m1, m2, n1, n2)
               } else {
-                out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
+                out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])^(1/(1-q[j]))
               }
             }
             ## q0 ana =========================================
@@ -987,13 +989,13 @@ RFD.est <- function(data, FDdistM, FDtau = NULL, knots = 11, size = NULL, q = c(
             ## ===================================================
             for (j in 1:qlength) {
               if (q[j] == 0) {
-                out[[zz]][j,1] <- FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S) + h0.FD
+                out[[zz]][j,1] <- FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j]) + h0.FD
               } else if (q[j] == 1) {
-                out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S) + h1.FD)
+                out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j]) + h1.FD)
               } else if (q[j] == 2) {
                 out[[zz]][j,1] <- FDq2(ai1.v, ai2.v, vi.all.v, m1, m2_all, n1, n2)
               } else {
-                out[[zz]][j,1] <- FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
+                out[[zz]][j,1] <- FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])^(1/(1-q[j]))
               }
             }
           }
@@ -1393,13 +1395,13 @@ RFD.singletau.est <- function(data, FDdistM, tau = NULL, knots = 11, size = NULL
 
       for (j in 1:qlength) {
         if (q[j] == 0) {
-          out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)
+          out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])
         } else if (q[j] == 1) {
-          out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S))
+          out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j]))
         } else if (q[j] == 2) {
           out[[zz]][j,1] <- FDq2(ai1.v, ai2.v, vi.all.v, m1, m2, n1, n2)
         } else {
-          out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
+          out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])^(1/(1-q[j]))
         }
       }
 
@@ -1474,13 +1476,13 @@ RFD.singletau.est <- function(data, FDdistM, tau = NULL, knots = 11, size = NULL
 
           for (j in 1:qlength) {
             if (q[j] == 0) {
-              out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)
+              out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])
             } else if (q[j] == 1) {
-              out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S))
+              out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j]))
             } else if (q[j] == 2) {
               out[[zz]][j,1] <- FDq2(ai1.v, ai2.v, vi.all.v, m1, m2, n1, n2)
             } else {
-              out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
+              out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])^(1/(1-q[j]))
             }
           }
 
@@ -1567,13 +1569,13 @@ RFD.singletau.est <- function(data, FDdistM, tau = NULL, knots = 11, size = NULL
       m2 = m2.v[zz]
       for (j in 1:qlength) {
         if (q[j] == 0) {
-          out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)
+          out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])
         } else if (q[j] == 1) {
-          out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S))
+          out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j]))
         } else if (q[j] == 2) {
           out[[zz]][j,1] <- FDq2(ai1.v, ai2.v, vi.all.v, m1, m2, n1, n2)
         } else {
-          out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
+          out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])^(1/(1-q[j]))
         }
       }
 
@@ -1622,14 +1624,14 @@ RFD.singletau.est <- function(data, FDdistM, tau = NULL, knots = 11, size = NULL
       ## ===================================================
       for (j in 1:qlength) {
         if (q[j] == 0) {
-          out[[zz]][j,1] <- FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S) + h0.FD
+          out[[zz]][j,1] <- FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j]) + h0.FD
         } else if (q[j] == 1) {
-          out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S) + h1.FD)
+          out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j]) + h1.FD)
         } else if (q[j] == 2) {
           # 記得放m2_all
           out[[zz]][j,1] <- FDq2(ai1.v, ai2.v, vi.all.v, m1, m2_all, n1, n2)
         } else {
-          out[[zz]][j,1] <- FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
+          out[[zz]][j,1] <- FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])^(1/(1-q[j]))
         }
       }
     }
@@ -1705,13 +1707,13 @@ RFD.singletau.est <- function(data, FDdistM, tau = NULL, knots = 11, size = NULL
 
           for (j in 1:qlength) {
             if (q[j] == 0) {
-              out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)
+              out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])
             } else if (q[j] == 1) {
-              out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S))
+              out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j]))
             } else if (q[j] == 2) {
               out[[zz]][j,1] <- FDq2(ai1.v, ai2.v, vi.all.v, m1, m2, n1, n2)
             } else {
-              out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
+              out[[zz]][j,1] <- FD_h_hat_fn(m1, m2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])^(1/(1-q[j]))
             }
           }
 
@@ -1756,13 +1758,13 @@ RFD.singletau.est <- function(data, FDdistM, tau = NULL, knots = 11, size = NULL
           ## ===================================================
           for (j in 1:qlength) {
             if (q[j] == 0) {
-              out[[zz]][j,1] <- FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S) + h0.FD
+              out[[zz]][j,1] <- FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j]) + h0.FD
             } else if (q[j] == 1) {
-              out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S) + h1.FD)
+              out[[zz]][j,1] <- exp(FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j]) + h1.FD)
             } else if (q[j] == 2) {
               out[[zz]][j,1] <- FDq2(ai1.v, ai2.v, vi.all.v, m1, m2_all, n1, n2)
             } else {
-              out[[zz]][j,1] <- FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
+              out[[zz]][j,1] <- FD_h_hat_fn(m1, n2, n1, n2, vi.all.v, ai1.v, ai2.v, q[j])^(1/(1-q[j]))
             }
           }
         }

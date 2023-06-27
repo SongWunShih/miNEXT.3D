@@ -48,8 +48,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // FD_h_hat_fn
-double FD_h_hat_fn(int m1, int m2, int n1, int n2, NumericVector vi, NumericVector ai1, NumericVector ai2, double q, int S);
-RcppExport SEXP _miNEXT_3D_FD_h_hat_fn(SEXP m1SEXP, SEXP m2SEXP, SEXP n1SEXP, SEXP n2SEXP, SEXP viSEXP, SEXP ai1SEXP, SEXP ai2SEXP, SEXP qSEXP, SEXP SSEXP) {
+double FD_h_hat_fn(int m1, int m2, int n1, int n2, NumericVector vi, NumericVector ai1, NumericVector ai2, double q);
+RcppExport SEXP _miNEXT_3D_FD_h_hat_fn(SEXP m1SEXP, SEXP m2SEXP, SEXP n1SEXP, SEXP n2SEXP, SEXP viSEXP, SEXP ai1SEXP, SEXP ai2SEXP, SEXP qSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -61,8 +61,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type ai1(ai1SEXP);
     Rcpp::traits::input_parameter< NumericVector >::type ai2(ai2SEXP);
     Rcpp::traits::input_parameter< double >::type q(qSEXP);
-    Rcpp::traits::input_parameter< int >::type S(SSEXP);
-    rcpp_result_gen = Rcpp::wrap(FD_h_hat_fn(m1, m2, n1, n2, vi, ai1, ai2, q, S));
+    rcpp_result_gen = Rcpp::wrap(FD_h_hat_fn(m1, m2, n1, n2, vi, ai1, ai2, q));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -105,8 +104,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // PD_g_hat_fn
-double PD_g_hat_fn(int m1, int m2, int n1, int n2, NumericVector Li, NumericVector ai1, NumericVector ai2, double q, int S, double Tbar);
-RcppExport SEXP _miNEXT_3D_PD_g_hat_fn(SEXP m1SEXP, SEXP m2SEXP, SEXP n1SEXP, SEXP n2SEXP, SEXP LiSEXP, SEXP ai1SEXP, SEXP ai2SEXP, SEXP qSEXP, SEXP SSEXP, SEXP TbarSEXP) {
+double PD_g_hat_fn(int m1, int m2, int n1, int n2, NumericVector Li, NumericVector ai1, NumericVector ai2, double q, double Tbar);
+RcppExport SEXP _miNEXT_3D_PD_g_hat_fn(SEXP m1SEXP, SEXP m2SEXP, SEXP n1SEXP, SEXP n2SEXP, SEXP LiSEXP, SEXP ai1SEXP, SEXP ai2SEXP, SEXP qSEXP, SEXP TbarSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -118,9 +117,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type ai1(ai1SEXP);
     Rcpp::traits::input_parameter< NumericVector >::type ai2(ai2SEXP);
     Rcpp::traits::input_parameter< double >::type q(qSEXP);
-    Rcpp::traits::input_parameter< int >::type S(SSEXP);
     Rcpp::traits::input_parameter< double >::type Tbar(TbarSEXP);
-    rcpp_result_gen = Rcpp::wrap(PD_g_hat_fn(m1, m2, n1, n2, Li, ai1, ai2, q, S, Tbar));
+    rcpp_result_gen = Rcpp::wrap(PD_g_hat_fn(m1, m2, n1, n2, Li, ai1, ai2, q, Tbar));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -160,8 +158,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // TD_f_hat_fn
-double TD_f_hat_fn(int m1, int m2, int n1, int n2, NumericVector ai1, NumericVector ai2, double q, int S);
-RcppExport SEXP _miNEXT_3D_TD_f_hat_fn(SEXP m1SEXP, SEXP m2SEXP, SEXP n1SEXP, SEXP n2SEXP, SEXP ai1SEXP, SEXP ai2SEXP, SEXP qSEXP, SEXP SSEXP) {
+double TD_f_hat_fn(int m1, int m2, int n1, int n2, NumericVector ai1, NumericVector ai2, double q);
+RcppExport SEXP _miNEXT_3D_TD_f_hat_fn(SEXP m1SEXP, SEXP m2SEXP, SEXP n1SEXP, SEXP n2SEXP, SEXP ai1SEXP, SEXP ai2SEXP, SEXP qSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -172,8 +170,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericVector >::type ai1(ai1SEXP);
     Rcpp::traits::input_parameter< NumericVector >::type ai2(ai2SEXP);
     Rcpp::traits::input_parameter< double >::type q(qSEXP);
-    Rcpp::traits::input_parameter< int >::type S(SSEXP);
-    rcpp_result_gen = Rcpp::wrap(TD_f_hat_fn(m1, m2, n1, n2, ai1, ai2, q, S));
+    rcpp_result_gen = Rcpp::wrap(TD_f_hat_fn(m1, m2, n1, n2, ai1, ai2, q));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -555,13 +552,13 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_miNEXT_3D_FD_h_fn", (DL_FUNC) &_miNEXT_3D_FD_h_fn, 9},
     {"_miNEXT_3D_FD_h_fn_all", (DL_FUNC) &_miNEXT_3D_FD_h_fn_all, 8},
-    {"_miNEXT_3D_FD_h_hat_fn", (DL_FUNC) &_miNEXT_3D_FD_h_hat_fn, 9},
+    {"_miNEXT_3D_FD_h_hat_fn", (DL_FUNC) &_miNEXT_3D_FD_h_hat_fn, 8},
     {"_miNEXT_3D_PD_g_fn", (DL_FUNC) &_miNEXT_3D_PD_g_fn, 9},
     {"_miNEXT_3D_PD_g_fn_all", (DL_FUNC) &_miNEXT_3D_PD_g_fn_all, 9},
-    {"_miNEXT_3D_PD_g_hat_fn", (DL_FUNC) &_miNEXT_3D_PD_g_hat_fn, 10},
+    {"_miNEXT_3D_PD_g_hat_fn", (DL_FUNC) &_miNEXT_3D_PD_g_hat_fn, 9},
     {"_miNEXT_3D_TD_f_fn", (DL_FUNC) &_miNEXT_3D_TD_f_fn, 8},
     {"_miNEXT_3D_TD_f_fn_all", (DL_FUNC) &_miNEXT_3D_TD_f_fn_all, 7},
-    {"_miNEXT_3D_TD_f_hat_fn", (DL_FUNC) &_miNEXT_3D_TD_f_hat_fn, 8},
+    {"_miNEXT_3D_TD_f_hat_fn", (DL_FUNC) &_miNEXT_3D_TD_f_hat_fn, 7},
     {"_miNEXT_3D_h0_cpp", (DL_FUNC) &_miNEXT_3D_h0_cpp, 5},
     {"_miNEXT_3D_h0_cpp_PD", (DL_FUNC) &_miNEXT_3D_h0_cpp_PD, 6},
     {"_miNEXT_3D_h0_cpp_FD", (DL_FUNC) &_miNEXT_3D_h0_cpp_FD, 6},

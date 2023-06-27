@@ -59,15 +59,20 @@ double FD_h_fn_all(double m1, double m2, double n1, double n2, double vi, double
 }
 
 // [[Rcpp::export]]
-double FD_h_hat_fn(int m1, int m2, int n1, int n2, NumericVector vi, NumericVector ai1, NumericVector ai2, double q, int S) {
+double FD_h_hat_fn(int m1, int m2, int n1, int n2, NumericVector vi, NumericVector ai1, NumericVector ai2, double q) {
   double output = 0;
+  
+  ai1 = ai1[vi > 0];
+  ai2 = ai2[vi > 0];
+  vi = vi[vi > 0];
+  int size = vi.size();
   if (q == 0) {
-    for(int i = 0; i < S; i++) {
-      output += vi[i]*(1-exp(Rf_lchoose((n1-ai1[i]),m1)-Rf_lchoose(n1,m1)) * exp(Rf_lchoose((n2-ai2[i]),m2)-Rf_lchoose(n2,m2)));
+    for(int i = 0; i < size; i++) {
+      output += vi[i] * (1 - exp(Rf_lchoose((n1 - ai1[i]), m1) - Rf_lchoose(n1, m1)) * exp(Rf_lchoose((n2 - ai2[i]), m2) - Rf_lchoose(n2, m2)));
     }
   } else {
-    for(int i = 0; i < S; i++) {
-      output += FD_h_fn_all(m1,m2,n1,n2,vi[i],ai1[i],ai2[i],q);
+    for(int i = 0; i < size; i++) {
+      output += FD_h_fn_all(m1, m2, n1, n2, vi[i], ai1[i], ai2[i], q);
     }
   }
   
@@ -124,10 +129,21 @@ double PD_g_fn_all(double m1, double m2, double n1, double n2, double Li, double
 }
 
 // [[Rcpp::export]]
-double PD_g_hat_fn(int m1, int m2, int n1, int n2, NumericVector Li, NumericVector ai1, NumericVector ai2, double q, int S, double Tbar) {
+double PD_g_hat_fn(int m1, int m2, int n1, int n2, NumericVector Li, NumericVector ai1, NumericVector ai2, double q, double Tbar) {
   double output = 0;
-  for(int i = 0; i < S; i++) {
-    output += PD_g_fn_all(m1,m2,n1,n2,Li[i],ai1[i],ai2[i],q,Tbar);
+  
+  ai1 = ai1[Li > 0];
+  ai2 = ai2[Li > 0];
+  Li = Li[Li > 0];
+  int size = Li.size();
+  if (q == 0) {
+    for(int i = 0; i < size; i++) {
+      output += Li[i] * (1 - exp(Rf_lchoose((n1 - ai1[i]), m1) - Rf_lchoose(n1, m1)) * exp(Rf_lchoose((n2 - ai2[i]), m2) - Rf_lchoose(n2, m2)));
+    }
+  } else {
+    for(int i = 0; i < size; i++) {
+      output += PD_g_fn_all(m1, m2, n1, n2, Li[i], ai1[i], ai2[i], q, Tbar);
+    }
   }
   return output;
 }
@@ -182,9 +198,10 @@ double TD_f_fn_all(double m1, double m2, double n1, double n2, double ai1, doubl
 }
 
 // [[Rcpp::export]]
-double TD_f_hat_fn(int m1, int m2, int n1, int n2, NumericVector ai1, NumericVector ai2, double q, int S) {
+double TD_f_hat_fn(int m1, int m2, int n1, int n2, NumericVector ai1, NumericVector ai2, double q) {
+  int size = ai1.size();
   double output = 0;
-  for(int i = 0; i < S; i++) {
+  for(int i = 0; i < size; i++) {
     output += TD_f_fn_all(m1,m2,n1,n2,ai1[i],ai2[i],q);
   }
   return output;
@@ -222,14 +239,14 @@ double h0_hat_cpp(NumericVector pi1, NumericVector pi2, int m1, int m2s, int n1,
     double sumsh = 0;
     for(int i=0; i < pi1_tmp.size(); i++){
       // sumsh = sumsh +  h0(pi1_tmp[i],pi2_tmp[i],m1,m2s,n2)/(1-pow(1-pi1_tmp[i], n1))/(1-pow(1-pi2_tmp[i], n2));
-      sumsh = sumsh +  h0_cpp(pi1_tmp[i],pi2_tmp[i],m1,m2s,n2)/((1-pow(1-pi1_tmp[i], n1))*(1-pow(1-pi2_tmp[i], n2)));
+      sumsh += h0_cpp(pi1_tmp[i],pi2_tmp[i],m1,m2s,n2)/((1-pow(1-pi1_tmp[i], n1))*(1-pow(1-pi2_tmp[i], n2)));
     }
     
     pi1_tmp = pi1[(pi1==0) & (pi2>0)];
     pi2_tmp = pi2[(pi1==0) & (pi2>0)];
     double sumx0 = 0;
     for(int i=0; i < pi1_tmp.size(); i++){
-      sumx0 = sumx0 +  h0_cpp(0,pi2_tmp[i],m1,m2s,n2)/(1-pow(1-pi2_tmp[i], n2));
+      sumx0 += h0_cpp(0,pi2_tmp[i],m1,m2s,n2)/(1-pow(1-pi2_tmp[i], n2));
     }
     output_all = sumsh+sumx0;
     //    output_sh = sumsh;
@@ -238,7 +255,7 @@ double h0_hat_cpp(NumericVector pi1, NumericVector pi2, int m1, int m2s, int n1,
     NumericVector pi2_tmp = pi2[(pi2>0)];
     double sum2 = 0;
     for(int i=0; i < pi2_tmp.size(); i++){
-      sum2 = sum2 + h0_cpp(0,pi2_tmp[i],0,m2s,n2)/(1-pow(1-pi2_tmp[i], n2));
+      sum2 += h0_cpp(0,pi2_tmp[i],0,m2s,n2)/(1-pow(1-pi2_tmp[i], n2));
     }
     output_all = sum2;
     //    output_sh = sum2;
@@ -250,7 +267,10 @@ double h0_hat_cpp(NumericVector pi1, NumericVector pi2, int m1, int m2s, int n1,
 
 // [[Rcpp::export]]
 double h0_hat_cpp_PD(NumericVector pi1, NumericVector pi2, NumericVector Li_v, int m1, int m2s, int n1, int n2){
-  double output_all= 0; 
+  double output_all= 0;
+  pi1 = pi1[Li_v > 0];
+  pi2 = pi2[Li_v > 0];
+  Li_v = Li_v[Li_v > 0];
   //  double output_sh = 0;
   if(m1>0){
     NumericVector pi1_tmp = pi1[(pi1>0) & (pi2>0)];
@@ -259,7 +279,7 @@ double h0_hat_cpp_PD(NumericVector pi1, NumericVector pi2, NumericVector Li_v, i
     double sumsh = 0;
     for(int i=0; i < pi1_tmp.size(); i++){
       // sumsh = sumsh +  h0(pi1_tmp[i],pi2_tmp[i],m1,m2s,n2)/(1-pow(1-pi1_tmp[i], n1))/(1-pow(1-pi2_tmp[i], n2));
-      sumsh = sumsh +  h0_cpp_PD(pi1_tmp[i],pi2_tmp[i],Li_tmp[i],m1,m2s,n2)/((1-pow(1-pi1_tmp[i], n1))*(1-pow(1-pi2_tmp[i], n2)));
+      sumsh += h0_cpp_PD(pi1_tmp[i],pi2_tmp[i],Li_tmp[i],m1,m2s,n2)/((1-pow(1-pi1_tmp[i], n1))*(1-pow(1-pi2_tmp[i], n2)));
     }
     
     pi1_tmp = pi1[(pi1==0) & (pi2>0)];
@@ -267,7 +287,7 @@ double h0_hat_cpp_PD(NumericVector pi1, NumericVector pi2, NumericVector Li_v, i
     Li_tmp = Li_v[(pi1==0) & (pi2>0)];
     double sumx0 = 0;
     for(int i=0; i < pi1_tmp.size(); i++){
-      sumx0 = sumx0 +  h0_cpp_PD(0,pi2_tmp[i],Li_tmp[i],m1,m2s,n2)/(1-pow(1-pi2_tmp[i], n2));
+      sumx0 += h0_cpp_PD(0,pi2_tmp[i],Li_tmp[i],m1,m2s,n2)/(1-pow(1-pi2_tmp[i], n2));
     }
     output_all = sumsh+sumx0;
     //    output_sh = sumsh;
@@ -277,7 +297,7 @@ double h0_hat_cpp_PD(NumericVector pi1, NumericVector pi2, NumericVector Li_v, i
     NumericVector Li_tmp = Li_v[(pi2>0)];
     double sum2 = 0;
     for(int i=0; i < pi2_tmp.size(); i++){
-      sum2 = sum2 + h0_cpp_PD(0,pi2_tmp[i],Li_tmp[i],0,m2s,n2)/(1-pow(1-pi2_tmp[i], n2));
+      sum2 += h0_cpp_PD(0,pi2_tmp[i],Li_tmp[i],0,m2s,n2)/(1-pow(1-pi2_tmp[i], n2));
     }
     output_all = sum2;
     //    output_sh = sum2;
@@ -289,7 +309,10 @@ double h0_hat_cpp_PD(NumericVector pi1, NumericVector pi2, NumericVector Li_v, i
 
 // [[Rcpp::export]]
 double h0_hat_cpp_FD(NumericVector pi1, NumericVector pi2, NumericVector vi_v, int m1, int m2s, int n1, int n2){
-  double output_all= 0; 
+  double output_all= 0;
+  pi1 = pi1[vi_v > 0];
+  pi2 = pi2[vi_v > 0];
+  vi_v = vi_v[vi_v > 0];
   //  double output_sh = 0;
   if(m1>0){
     NumericVector pi1_tmp = pi1[(pi1>0) & (pi2>0)];
@@ -298,7 +321,7 @@ double h0_hat_cpp_FD(NumericVector pi1, NumericVector pi2, NumericVector vi_v, i
     double sumsh = 0;
     for(int i=0; i < pi1_tmp.size(); i++){
       // sumsh = sumsh +  h0(pi1_tmp[i],pi2_tmp[i],m1,m2s,n2)/(1-pow(1-pi1_tmp[i], n1))/(1-pow(1-pi2_tmp[i], n2));
-      sumsh = sumsh +  h0_cpp_FD(pi1_tmp[i],pi2_tmp[i],vi_tmp[i],m1,m2s,n2)/((1-pow(1-pi1_tmp[i], n1))*(1-pow(1-pi2_tmp[i], n2)));
+      sumsh += h0_cpp_FD(pi1_tmp[i],pi2_tmp[i],vi_tmp[i],m1,m2s,n2)/((1-pow(1-pi1_tmp[i], n1))*(1-pow(1-pi2_tmp[i], n2)));
     }
     
     pi1_tmp = pi1[(pi1==0) & (pi2>0)];
@@ -306,7 +329,7 @@ double h0_hat_cpp_FD(NumericVector pi1, NumericVector pi2, NumericVector vi_v, i
     vi_tmp = vi_v[(pi1==0) & (pi2>0)];
     double sumx0 = 0;
     for(int i=0; i < pi1_tmp.size(); i++){
-      sumx0 = sumx0 +  h0_cpp_FD(0,pi2_tmp[i],vi_tmp[i],m1,m2s,n2)/(1-pow(1-pi2_tmp[i], n2));
+      sumx0 += h0_cpp_FD(0,pi2_tmp[i],vi_tmp[i],m1,m2s,n2)/(1-pow(1-pi2_tmp[i], n2));
     }
     output_all = sumsh+sumx0;
     //    output_sh = sumsh;
@@ -316,7 +339,7 @@ double h0_hat_cpp_FD(NumericVector pi1, NumericVector pi2, NumericVector vi_v, i
     NumericVector vi_tmp = vi_v[(pi2>0)];
     double sum2 = 0;
     for(int i=0; i < pi2_tmp.size(); i++){
-      sum2 = sum2 + h0_cpp_FD(0,pi2_tmp[i],vi_tmp[i],0,m2s,n2)/(1-pow(1-pi2_tmp[i], n2));
+      sum2 += h0_cpp_FD(0,pi2_tmp[i],vi_tmp[i],0,m2s,n2)/(1-pow(1-pi2_tmp[i], n2));
     }
     output_all = sum2;
     //    output_sh = sum2;
@@ -391,16 +414,16 @@ double h1(double pi1, double pi2, double m1, double m2, double n1, double n2){
   
   for(int k2=0; k2 <= m2; k2++){
     for(int k1=0; k1 <= m1; k1++){
-      if((k1 == 0) & (k2 == 0)){ tmp1 = 0; }
-      else{ tmp1 = tmp1 + (k1+k2)/(m1+m2)*log((k1+k2)/(m1+m2))*TD_theo(pi1,pi2,m1,m2,k1,k2); }
+      if((k1 == 0) & (k2 == 0)){ tmp1 += 0; }
+      else{ tmp1 += (k1+k2)/(m1+m2)*log((k1+k2)/(m1+m2))*TD_theo(pi1,pi2,m1,m2,k1,k2); }
     }
   }
   tmp1 = -tmp1;
   
   for(int k2=0; k2 <= n2; k2++){
     for(int k1=0; k1 <= m1; k1++){
-      if((k1 == 0) & (k2 == 0)){ tmp2 = 0; }
-      else{ tmp2 = tmp2 + (k1+k2)/(m1+n2)*log((k1+k2)/(m1+n2))*TD_theo(pi1,pi2,m1,n2,k1,k2); }
+      if((k1 == 0) & (k2 == 0)){ tmp2 += 0; }
+      else{ tmp2 += (k1+k2)/(m1+n2)*log((k1+k2)/(m1+n2))*TD_theo(pi1,pi2,m1,n2,k1,k2); }
     }
   }
   tmp2 = -tmp2;
@@ -418,13 +441,13 @@ double h1_assem2( double pi2,double m2, double n2){
   
   for(int k2=1; k2 <= m2; k2++){
     
-    tmp1 = tmp1 + (k2)/(m2)*log((k2)/(m2))*TD_theo(0,pi2,0,m2,0,k2);
+    tmp1 += (k2)/(m2)*log((k2)/(m2))*TD_theo(0,pi2,0,m2,0,k2);
   }
   tmp1 = -tmp1;
   
   for(int k2=1; k2 <= n2; k2++){
     
-    tmp2 = tmp2 + (k2)/(n2)*log((k2)/(n2))*TD_theo(0,pi2,0,n2,0,k2); 
+    tmp2 += (k2)/(n2)*log((k2)/(n2))*TD_theo(0,pi2,0,n2,0,k2); 
     
   }
   tmp2 = -tmp2;
@@ -447,7 +470,7 @@ double h1_hat(NumericVector pi1, NumericVector pi2, NumericVector xi1, NumericVe
     //Rcout << "h1_hat size=" << pi1_tmp.size() << std::endl;
     //    double sumsh_p = 0;
     for(int i=0; i < pi1_tmp.size(); i++){
-      sumsh = sumsh +  h1(pi1_tmp[i],pi2_tmp[i],m1,m2,n1,n2)/(1-pow(1-pi1_tmp[i], n1))/(1-pow(1-pi2_tmp[i], n2));
+      sumsh += h1(pi1_tmp[i],pi2_tmp[i],m1,m2,n1,n2)/(1-pow(1-pi1_tmp[i], n1))/(1-pow(1-pi2_tmp[i], n2));
       //      sumsh_p = sumsh_p +  h1(pi1_tmp[i],pi2_tmp[i],t1,t2,UT1,UT2,T1,T2,1)/(1-pow(1-pi1_tmp[i], T1))/(1-pow(1-pi2_tmp[i], T2));
     }
     
@@ -455,14 +478,14 @@ double h1_hat(NumericVector pi1, NumericVector pi2, NumericVector xi1, NumericVe
     pi2_tmp = pi2[(xi1==0) & (xi2>0)];
     double sumx0 = 0;
     for(int i=0; i < pi1_tmp.size(); i++){
-      sumx0 = sumx0 +  h1(0,pi2_tmp[i],m1,m2,n1,n2)/(1-pow(1-pi2_tmp[i], n2));
+      sumx0 += h1(0,pi2_tmp[i],m1,m2,n1,n2)/(1-pow(1-pi2_tmp[i], n2));
     }
     
     pi1_tmp = pi1[(xi1>0) & (xi2==0)];
     pi2_tmp = pi2[(xi1>0) & (xi2==0)];
     double sumy0 = 0;
     for(int i=0; i < pi1_tmp.size(); i++){
-      sumy0 = sumy0 +  h1(pi1_tmp[i],0,m1,m2,n1,n2)/(1-pow(1-pi1_tmp[i], n1));
+      sumy0 += h1(pi1_tmp[i],0,m1,m2,n1,n2)/(1-pow(1-pi1_tmp[i], n1));
     }
     output_all = sumsh+sumx0+sumy0;
     //    output_sh = sumsh_p;
@@ -475,7 +498,7 @@ double h1_hat(NumericVector pi1, NumericVector pi2, NumericVector xi1, NumericVe
     
     for(int i=0; i < pi2_tmp.size(); i++){
       
-      sum2 = sum2 +  h1_assem2(pi2_tmp[i],m2,n2)/(1-pow(1-pi2_tmp[i], n2));
+      sum2 += h1_assem2(pi2_tmp[i],m2,n2)/(1-pow(1-pi2_tmp[i], n2));
       //Rcout << "The value sum2 z is " << z << std::endl;
     }
     output_all = sum2;
@@ -495,16 +518,16 @@ double h1_PD(double pi1, double pi2, double Li, double Tbar, double m1, double m
   
   for(int k2=0; k2 <= m2; k2++){
     for(int k1=0; k1 <= m1; k1++){
-      if((k1 == 0) & (k2 == 0)){ tmp1 = 0; }
-      else{ tmp1 = tmp1 + (k1+k2)/(m1+m2)/Tbar*log((k1+k2)/(m1+m2)/Tbar)*PD_theo(pi1,pi2,Li,m1,m2,k1,k2); }
+      if((k1 == 0) & (k2 == 0)){ tmp1 += 0; }
+      else{ tmp1 += (k1+k2)/(m1+m2)/Tbar*log((k1+k2)/(m1+m2)/Tbar)*PD_theo(pi1,pi2,Li,m1,m2,k1,k2); }
     }
   }
   tmp1 = -tmp1;
   
   for(int k2=0; k2 <= n2; k2++){
     for(int k1=0; k1 <= m1; k1++){
-      if((k1 == 0) & (k2 == 0)){ tmp2 = 0; }
-      else{ tmp2 = tmp2 + (k1+k2)/(m1+n2)/Tbar*log((k1+k2)/(m1+n2)/Tbar)*PD_theo(pi1,pi2,Li,m1,n2,k1,k2); }
+      if((k1 == 0) & (k2 == 0)){ tmp2 += 0; }
+      else{ tmp2 += (k1+k2)/(m1+n2)/Tbar*log((k1+k2)/(m1+n2)/Tbar)*PD_theo(pi1,pi2,Li,m1,n2,k1,k2); }
     }
   }
   tmp2 = -tmp2;
@@ -523,13 +546,13 @@ double h1_assem2_PD( double pi2, double Li, double Tbar, double m2, double n2){
   
   for(int k2=1; k2 <= m2; k2++){
     
-    tmp1 = tmp1 + (k2)/(m2*Tbar)*log((k2)/(m2*Tbar))*PD_theo(0,pi2,Li,0,m2,0,k2);
+    tmp1 += (k2)/(m2*Tbar)*log((k2)/(m2*Tbar))*PD_theo(0,pi2,Li,0,m2,0,k2);
   }
   tmp1 = -tmp1;
   
   for(int k2=1; k2 <= n2; k2++){
     
-    tmp2 = tmp2 + (k2)/(n2*Tbar)*log((k2)/(n2*Tbar))*PD_theo(0,pi2,Li,0,n2,0,k2); 
+    tmp2 += (k2)/(n2*Tbar)*log((k2)/(n2*Tbar))*PD_theo(0,pi2,Li,0,n2,0,k2); 
     
   }
   tmp2 = -tmp2;
@@ -544,6 +567,11 @@ double h1_assem2_PD( double pi2, double Li, double Tbar, double m2, double n2){
 double h1_hat_PD(NumericVector pi1, NumericVector pi2, NumericVector Li_v, double Tbar, NumericVector xi1, NumericVector xi2, int m1, int m2, int n1, int n2){
   double output_all = 0;
   //  double output_sh = 0;
+  pi1 = pi1[Li_v > 0];
+  pi2 = pi2[Li_v > 0];
+  xi1 = xi1[Li_v > 0];
+  xi2 = xi2[Li_v > 0];
+  Li_v = Li_v[Li_v > 0];
   if(m1>0){
     NumericVector pi1_tmp = pi1[(xi1>0) & (xi2>0)];
     NumericVector pi2_tmp = pi2[(xi1>0) & (xi2>0)];
@@ -553,7 +581,7 @@ double h1_hat_PD(NumericVector pi1, NumericVector pi2, NumericVector Li_v, doubl
     //Rcout << "h1_hat size=" << pi1_tmp.size() << std::endl;
     //    double sumsh_p = 0;
     for(int i=0; i < pi1_tmp.size(); i++){
-      sumsh = sumsh +  h1_PD(pi1_tmp[i],pi2_tmp[i],Li_tmp[i],Tbar,m1,m2,n1,n2)/(1-pow(1-pi1_tmp[i], n1))/(1-pow(1-pi2_tmp[i], n2));
+      sumsh += h1_PD(pi1_tmp[i],pi2_tmp[i],Li_tmp[i],Tbar,m1,m2,n1,n2)/(1-pow(1-pi1_tmp[i], n1))/(1-pow(1-pi2_tmp[i], n2));
       //      sumsh_p = sumsh_p +  h1(pi1_tmp[i],pi2_tmp[i],t1,t2,UT1,UT2,T1,T2,1)/(1-pow(1-pi1_tmp[i], T1))/(1-pow(1-pi2_tmp[i], T2));
     }
     
@@ -563,7 +591,7 @@ double h1_hat_PD(NumericVector pi1, NumericVector pi2, NumericVector Li_v, doubl
 
     double sumx0 = 0;
     for(int i=0; i < pi1_tmp.size(); i++){
-      sumx0 = sumx0 +  h1_PD(0,pi2_tmp[i],Li_tmp[i],Tbar,m1,m2,n1,n2)/(1-pow(1-pi2_tmp[i], n2));
+      sumx0 += h1_PD(0,pi2_tmp[i],Li_tmp[i],Tbar,m1,m2,n1,n2)/(1-pow(1-pi2_tmp[i], n2));
     }
     
     pi1_tmp = pi1[(xi1>0) & (xi2==0)];
@@ -572,7 +600,7 @@ double h1_hat_PD(NumericVector pi1, NumericVector pi2, NumericVector Li_v, doubl
 
     double sumy0 = 0;
     for(int i=0; i < pi1_tmp.size(); i++){
-      sumy0 = sumy0 +  h1_PD(pi1_tmp[i],0,Li_tmp[i],Tbar,m1,m2,n1,n2)/(1-pow(1-pi1_tmp[i], n1));
+      sumy0 += h1_PD(pi1_tmp[i],0,Li_tmp[i],Tbar,m1,m2,n1,n2)/(1-pow(1-pi1_tmp[i], n1));
     }
     output_all = sumsh+sumx0+sumy0;
     //    output_sh = sumsh_p;
@@ -586,7 +614,7 @@ double h1_hat_PD(NumericVector pi1, NumericVector pi2, NumericVector Li_v, doubl
     
     for(int i=0; i < pi2_tmp.size(); i++){
       
-      sum2 = sum2 +  h1_assem2_PD(pi2_tmp[i],Li_tmp[i],Tbar,m2,n2)/(1-pow(1-pi2_tmp[i], n2));
+      sum2 += h1_assem2_PD(pi2_tmp[i],Li_tmp[i],Tbar,m2,n2)/(1-pow(1-pi2_tmp[i], n2));
       //Rcout << "The value sum2 z is " << z << std::endl;
     }
     output_all = sum2;
@@ -606,16 +634,16 @@ double h1_FD(double pi1, double pi2, double vi, double m1, double m2, double n1,
   
   for(int k2=0; k2 <= m2; k2++){
     for(int k1=0; k1 <= m1; k1++){
-      if((k1 == 0) & (k2 == 0)){ tmp1 = 0; }
-      else{ tmp1 = tmp1 + (k1+k2)/(m1+m2)*log((k1+k2)/(m1+m2))*FD_theo(pi1,pi2,vi,m1,m2,k1,k2); }
+      if((k1 == 0) & (k2 == 0)){ tmp1 += 0; }
+      else{ tmp1 += (k1+k2)/(m1+m2)*log((k1+k2)/(m1+m2))*FD_theo(pi1,pi2,vi,m1,m2,k1,k2); }
     }
   }
   tmp1 = -tmp1;
   
   for(int k2=0; k2 <= n2; k2++){
     for(int k1=0; k1 <= m1; k1++){
-      if((k1 == 0) & (k2 == 0)){ tmp2 = 0; }
-      else{ tmp2 = tmp2 + (k1+k2)/(m1+n2)*log((k1+k2)/(m1+n2))*FD_theo(pi1,pi2,vi,m1,n2,k1,k2); }
+      if((k1 == 0) & (k2 == 0)){ tmp2 += 0; }
+      else{ tmp2 += (k1+k2)/(m1+n2)*log((k1+k2)/(m1+n2))*FD_theo(pi1,pi2,vi,m1,n2,k1,k2); }
     }
   }
   tmp2 = -tmp2;
@@ -634,13 +662,13 @@ double h1_assem2_FD(double pi2, double vi, double m2, double n2){
   
   for(int k2=1; k2 <= m2; k2++){
     
-    tmp1 = tmp1 + (k2)/(m2)*log((k2)/(m2))*FD_theo(0,pi2,vi,0,m2,0,k2);
+    tmp1 += (k2)/(m2)*log((k2)/(m2))*FD_theo(0,pi2,vi,0,m2,0,k2);
   }
   tmp1 = -tmp1;
   
   for(int k2=1; k2 <= n2; k2++){
     
-    tmp2 = tmp2 + (k2)/(n2)*log((k2)/(n2))*FD_theo(0,pi2,vi,0,n2,0,k2); 
+    tmp2 += (k2)/(n2)*log((k2)/(n2))*FD_theo(0,pi2,vi,0,n2,0,k2); 
     
   }
   tmp2 = -tmp2;
@@ -654,6 +682,11 @@ double h1_assem2_FD(double pi2, double vi, double m2, double n2){
 // [[Rcpp::export]]
 double h1_hat_FD(NumericVector pi1, NumericVector pi2, NumericVector vi_v, NumericVector xi1, NumericVector xi2, int m1, int m2, int n1, int n2){
   double output_all = 0;
+  pi1 = pi1[vi_v > 0];
+  pi2 = pi2[vi_v > 0];
+  xi1 = xi1[vi_v > 0];
+  xi2 = xi2[vi_v > 0];
+  vi_v = vi_v[vi_v > 0];
   //  double output_sh = 0;
   if(m1>0){
     NumericVector pi1_tmp = pi1[(xi1>0) & (xi2>0)];
@@ -664,7 +697,7 @@ double h1_hat_FD(NumericVector pi1, NumericVector pi2, NumericVector vi_v, Numer
     //Rcout << "h1_hat size=" << pi1_tmp.size() << std::endl;
     //    double sumsh_p = 0;
     for(int i=0; i < pi1_tmp.size(); i++){
-      sumsh = sumsh +  h1_FD(pi1_tmp[i],pi2_tmp[i],vi_tmp[i],m1,m2,n1,n2)/(1-pow(1-pi1_tmp[i], n1))/(1-pow(1-pi2_tmp[i], n2));
+      sumsh += h1_FD(pi1_tmp[i],pi2_tmp[i],vi_tmp[i],m1,m2,n1,n2)/(1-pow(1-pi1_tmp[i], n1))/(1-pow(1-pi2_tmp[i], n2));
       //      sumsh_p = sumsh_p +  h1(pi1_tmp[i],pi2_tmp[i],t1,t2,UT1,UT2,T1,T2,1)/(1-pow(1-pi1_tmp[i], T1))/(1-pow(1-pi2_tmp[i], T2));
     }
     
@@ -674,7 +707,7 @@ double h1_hat_FD(NumericVector pi1, NumericVector pi2, NumericVector vi_v, Numer
 
     double sumx0 = 0;
     for(int i=0; i < pi1_tmp.size(); i++){
-      sumx0 = sumx0 +  h1_FD(0,pi2_tmp[i],vi_tmp[i],m1,m2,n1,n2)/(1-pow(1-pi2_tmp[i], n2));
+      sumx0 += h1_FD(0,pi2_tmp[i],vi_tmp[i],m1,m2,n1,n2)/(1-pow(1-pi2_tmp[i], n2));
     }
     
     pi1_tmp = pi1[(xi1>0) & (xi2==0)];
@@ -683,7 +716,7 @@ double h1_hat_FD(NumericVector pi1, NumericVector pi2, NumericVector vi_v, Numer
 
     double sumy0 = 0;
     for(int i=0; i < pi1_tmp.size(); i++){
-      sumy0 = sumy0 +  h1_FD(pi1_tmp[i],0,vi_tmp[i],m1,m2,n1,n2)/(1-pow(1-pi1_tmp[i], n1));
+      sumy0 += h1_FD(pi1_tmp[i],0,vi_tmp[i],m1,m2,n1,n2)/(1-pow(1-pi1_tmp[i], n1));
     }
     output_all = sumsh+sumx0+sumy0;
     //    output_sh = sumsh_p;
@@ -697,7 +730,7 @@ double h1_hat_FD(NumericVector pi1, NumericVector pi2, NumericVector vi_v, Numer
     
     for(int i=0; i < pi2_tmp.size(); i++){
       
-      sum2 = sum2 +  h1_assem2_FD(pi2_tmp[i],vi_tmp[i],m2,n2)/(1-pow(1-pi2_tmp[i], n2));
+      sum2 += h1_assem2_FD(pi2_tmp[i],vi_tmp[i],m2,n2)/(1-pow(1-pi2_tmp[i], n2));
       //Rcout << "The value sum2 z is " << z << std::endl;
     }
     output_all = sum2;

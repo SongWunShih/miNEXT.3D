@@ -247,7 +247,7 @@ RTD.est <- function(data, knots = 11, size = NULL, q = c(0,1,2), conf = 0.95, nb
   }
 
   if(n1<=n2){
-    S <- nrow(data)
+    # S <- nrow(data)
     qlength <- length(q)
     out = list()
     ai1.v = data[,1]
@@ -263,13 +263,13 @@ RTD.est <- function(data, knots = 11, size = NULL, q = c(0,1,2), conf = 0.95, nb
 
       for (j in 1:qlength) {
         if (q[j] == 0) {
-          out[[zz]][j,1] <- TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j], S)
+          out[[zz]][j,1] <- TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j])
         } else if (q[j] == 1) {
-          out[[zz]][j,1] <- exp(TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j], S))
+          out[[zz]][j,1] <- exp(TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j]))
         } else if (q[j] == 2) {
           out[[zz]][j,1] <- TDq2(ai1.v, ai2.v, m1, m2, n1, n2)
         } else {
-          out[[zz]][j,1] <- TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
+          out[[zz]][j,1] <- TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j])^(1/(1-q[j]))
         }
       }
 
@@ -309,7 +309,7 @@ RTD.est <- function(data, knots = 11, size = NULL, q = c(0,1,2), conf = 0.95, nb
         data_bt = sapply(1:ncol(data), function(k) rmultinom(n = 1,
                                                              size = sum(data[, k]), prob = p_bt[, k]))
 
-        S <- nrow(data_bt) ## 注意是B不是S
+        # S <- nrow(data_bt)
         qlength <- length(q)
         out = list()
 
@@ -324,13 +324,13 @@ RTD.est <- function(data, knots = 11, size = NULL, q = c(0,1,2), conf = 0.95, nb
 
           for (j in 1:qlength) {
             if (q[j] == 0) {
-              out[[zz]][j,1] <- TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j], S)
+              out[[zz]][j,1] <- TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j])
             } else if (q[j] == 1) {
-              out[[zz]][j,1] <- exp(TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j], S))
+              out[[zz]][j,1] <- exp(TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j]))
             } else if (q[j] == 2) {
               out[[zz]][j,1] <- TDq2(ai1.v, ai2.v, m1, m2, n1, n2)
             } else {
-              out[[zz]][j,1] <- TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
+              out[[zz]][j,1] <- TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j])^(1/(1-q[j]))
             }
           }
 
@@ -392,7 +392,7 @@ RTD.est <- function(data, knots = 11, size = NULL, q = c(0,1,2), conf = 0.95, nb
     return(list(out = output,q0_ana = q0_ana,ori.prop = prop.v,m.v = m.v,line_type = line_type))
   }else{
 
-    S <- nrow(data)
+    # S <- nrow(data)
     qlength <- length(q)
     out = list()
     ai1.v = data[,1]
@@ -408,13 +408,13 @@ RTD.est <- function(data, knots = 11, size = NULL, q = c(0,1,2), conf = 0.95, nb
 
       for (j in 1:qlength) {
         if (q[j] == 0) {
-          out[[zz]][j,1] <- TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j], S)
+          out[[zz]][j,1] <- TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j])
         } else if (q[j] == 1) {
-          out[[zz]][j,1] <- exp(TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j], S))
+          out[[zz]][j,1] <- exp(TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j]))
         } else if (q[j] == 2) {
           out[[zz]][j,1] <- TDq2(ai1.v, ai2.v, m1, m2, n1, n2)
         } else {
-          out[[zz]][j,1] <- TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
+          out[[zz]][j,1] <- TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j])^(1/(1-q[j]))
         }
       }
     }
@@ -435,13 +435,13 @@ RTD.est <- function(data, knots = 11, size = NULL, q = c(0,1,2), conf = 0.95, nb
 
       for (j in 1:qlength) {
         if (q[j] == 0) {
-          out[[zz]][j,1] <- TD_f_hat_fn(m1, n2, n1, n2, ai1.v, ai2.v, q[j], S) + h0.TD
+          out[[zz]][j,1] <- TD_f_hat_fn(m1, n2, n1, n2, ai1.v, ai2.v, q[j]) + h0.TD
         } else if (q[j] == 1) {
-          out[[zz]][j,1] <- exp(TD_f_hat_fn(m1, n2, n1, n2, ai1.v, ai2.v, q[j], S) + h1.TD)
+          out[[zz]][j,1] <- exp(TD_f_hat_fn(m1, n2, n1, n2, ai1.v, ai2.v, q[j]) + h1.TD)
         } else if (q[j] == 2) {
           out[[zz]][j,1] <- TDq2(ai1.v, ai2.v, m1, m2_all, n1, n2)
         } else {
-          out[[zz]][j,1] <- TD_f_hat_fn(m1, n2, n1, n2, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
+          out[[zz]][j,1] <- TD_f_hat_fn(m1, n2, n1, n2, ai1.v, ai2.v, q[j])^(1/(1-q[j]))
         }
       }
     }
@@ -488,7 +488,7 @@ RTD.est <- function(data, knots = 11, size = NULL, q = c(0,1,2), conf = 0.95, nb
         # new ==================================
         p_bind_bt = cbind(DetAbu(data_bt[,1], zero = T),DetAbu(data_bt[,2], zero = T))
         # ==========================================
-        S <- nrow(data_bt)
+        # S <- nrow(data_bt)
         qlength <- length(q)
         out = list()
 
@@ -505,13 +505,13 @@ RTD.est <- function(data, knots = 11, size = NULL, q = c(0,1,2), conf = 0.95, nb
 
           for (j in 1:qlength) {
             if (q[j] == 0) {
-              out[[zz]][j,1] <- TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j], S)
+              out[[zz]][j,1] <- TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j])
             } else if (q[j] == 1) {
-              out[[zz]][j,1] <- exp(TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j], S))
+              out[[zz]][j,1] <- exp(TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j]))
             } else if (q[j] == 2) {
               out[[zz]][j,1] <- TDq2(ai1.v, ai2.v, m1, m2, n1, n2)
             } else {
-              out[[zz]][j,1] <- TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
+              out[[zz]][j,1] <- TD_f_hat_fn(m1, m2, n1, n2, ai1.v, ai2.v, q[j])^(1/(1-q[j]))
             }
           }
         }
@@ -532,13 +532,13 @@ RTD.est <- function(data, knots = 11, size = NULL, q = c(0,1,2), conf = 0.95, nb
 
           for (j in 1:qlength) {
             if (q[j] == 0) {
-              out[[zz]][j,1] <- TD_f_hat_fn(m1, n2, n1, n2, ai1.v, ai2.v, q[j], S) + h0.TD
+              out[[zz]][j,1] <- TD_f_hat_fn(m1, n2, n1, n2, ai1.v, ai2.v, q[j]) + h0.TD
             } else if (q[j] == 1) {
-              out[[zz]][j,1] <- exp(TD_f_hat_fn(m1, n2, n1, n2, ai1.v, ai2.v, q[j], S) + h1.TD)
+              out[[zz]][j,1] <- exp(TD_f_hat_fn(m1, n2, n1, n2, ai1.v, ai2.v, q[j]) + h1.TD)
             } else if (q[j] == 2) {
               out[[zz]][j,1] <- TDq2(ai1.v, ai2.v, m1, m2_all, n1, n2)
             } else {
-              out[[zz]][j,1] <- TD_f_hat_fn(m1, n2, n1, n2, ai1.v, ai2.v, q[j], S)^(1/(1-q[j]))
+              out[[zz]][j,1] <- TD_f_hat_fn(m1, n2, n1, n2, ai1.v, ai2.v, q[j])^(1/(1-q[j]))
             }
           }
         }
