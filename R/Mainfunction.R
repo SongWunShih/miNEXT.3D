@@ -265,6 +265,7 @@ miNEXT3D = function(data, diversity, q = c(0,1,2), knots = 11, size = NULL, nboo
                                 Assemblage = colnames(data)[2],
                                 Tau = est.final$Tau)
     }
+    est.ori.df = dplyr::filter(est.ori.df,prop.v <= 100)
     est.trans.df = dplyr::filter(est.trans.df,prop.v <= 100)
 
 
