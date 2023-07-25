@@ -268,7 +268,9 @@ miNEXT3D = function(data, diversity, q = c(0,1,2), knots = 11, size = NULL, nboo
     est.ori.df = dplyr::filter(est.ori.df,prop.v <= 100)
     est.trans.df = dplyr::filter(est.trans.df,prop.v <= 100)
 
-
+    est.final[,c(5,6,7)] = round(est.final[,c(5,6,7)],3)
+    est.ori.df[,c(4,5,6)] = round(est.ori.df[,c(4,5,6)],3)
+    est.trans.df[,c(4,5,6)] = round(est.trans.df[,c(4,5,6)],3)
     return(list(Mixture = est.final, Original = est.ori.df, Transform = est.trans.df, q0_ana = q0_ana))
 
   }
